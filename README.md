@@ -1,4 +1,4 @@
-# Hylé explorer
+# Hyléoù
 
 WIP, minimalistic explorer for the Hylé chain.
 
