@@ -27,7 +27,7 @@ onMounted(async () => {
     const response = await fetch(`${getNetworkApiUrl(network.value)}/hyle/zktx/v1/contract/${contract_name.value}`);
     contractData[contract_name.value] = (await response.json()).contract;
 
-    const txResp = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="tx.height>=0"&page=1&per_page=10&order_by="desc"`);
+    const txResp = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="hyle.zktx.v1.EventStateChange.contract_name='\\"${contract_name.value}\\"'"&page=1&per_page=10&order_by="desc"&match_events=true`);
     transactions.value = (await txResp.json()).result.txs;
 });
 
@@ -44,7 +44,6 @@ onMounted(async () => {
             }}</code></p>
         <div class="my-4">
             <h2>Transactions</h2>
-            <p>(Actually TODO)</p>
             <RouterLink :to="{ name: 'transaction', params: { tx_hash: tx.hash } }" v-for="tx in transactions"
                 :key="tx.hash">
                 <p> - Tx
@@ -52,6 +51,7 @@ onMounted(async () => {
                     (block #{{ tx.height }})
                 </p>
             </RouterLink>
+            <p v-if="transactions.length === 0">No transactions found</p>
         </div>
     </div>
 </template>
