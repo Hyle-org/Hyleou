@@ -114,8 +114,10 @@ const GetErc20Output = (tx: MsgExecuteStateChanges) => {
         <pre
             v-if="transactionData?.[txHash]?.status === 'failure'">{{ transactionData?.[txHash]?.rawFullTxData?.tx_result?.log || 'Unknown error' }}</pre>
         <div class="my-4" v-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgRegisterContract'">
-            <p>Contract registration for &quot;{{ getParsedTx<MsgRegisterContract>
-            (transactionData?.[txHash]).contractName }}&quot;
+            <p>Contract registration for <RouterLink
+                    :to="{ name: 'contract', params: { contract_name: getParsedTx<MsgRegisterContract>(transactionData?.[txHash]).contractName } }">
+                    {{ getParsedTx<MsgRegisterContract>
+            (transactionData?.[txHash]).contractName }}</RouterLink>
             </p>
             <p>Initial state: {{ Array.from(getParsedTx<MsgRegisterContract>
             (transactionData?.[txHash]).stateDigest).map(x => x.toString(16).padStart(2, '0')).join('') }}</p>

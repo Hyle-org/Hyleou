@@ -51,6 +51,10 @@ button:disabled {
     @apply bg-gray-500 text-opacity-50;
 }
 
+p a {
+    @apply border-b-2 border-secondary;
+}
+
 i.spinner {
     @apply animate-spin;
     @apply inline-block border-4 border-t-4 border-secondary border-t-primary rounded-full w-4 h-4 mt-1 mx-1;

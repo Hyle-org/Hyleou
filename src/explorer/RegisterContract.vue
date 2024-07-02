@@ -48,7 +48,11 @@ const submitForm = async () => {
             stringToBytes(initialStateDigest.value)
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        registerValue.value = await checkTxStatus(tx.transactionHash);
+        const code = await checkTxStatus(tx.transactionHash);
+        if (code.status === 'success')
+            registerValue.value = tx.transactionHash;
+        else
+            registerError.value = code.error!;
     } catch (e: any) {
         registerError.value = e.message;
     }
@@ -99,7 +103,9 @@ const submitForm = async () => {
                 </div>
                 <div v-if="registerValue">
                     <p>Contract registered successfully:</p>
-                    <pre class="text-sm font-mono">{{ registerValue }}</pre>
+                    <RouterLink :to="{ name: 'transaction', params: { tx_hash: registerValue } }">
+                        <p>Transaction: {{ registerValue }}</p>
+                    </RouterLink>
                 </div>
             </div>
         </div>
