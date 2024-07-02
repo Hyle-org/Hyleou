@@ -19,15 +19,8 @@ COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 RUN bun run build
 
-# copy production dependencies and source code into final image
-FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/dist .
-COPY --from=prerelease /usr/src/app/package.json .
-COPY . .
+FROM nginx:latest
 
-# run the app
 EXPOSE 8000
-ENTRYPOINT [ "bun", "run", "preview" ]
-# EXPOSE 5173
-# ENTRYPOINT [ "bun", "run", "dev", "--host" ]
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=prerelease /usr/src/app/dist /var/www/sltech/
