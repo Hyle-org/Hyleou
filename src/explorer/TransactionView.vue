@@ -18,7 +18,7 @@ type TransactionInfo = {
     status: 'success' | 'failure';
     type: '/hyle.zktx.v1.MsgRegisterContract' | string;
     rawData: string;
-    rawFullTxData: string;
+    rawFullTxData: any;
 }
 const transactionData = reactive({} as Record<string, TransactionInfo>);
 
@@ -29,9 +29,9 @@ onMounted(async () => {
         hash: data.result.hash,
         height: data.result.height,
         status: data.result.tx_result.code === 0 ? 'success' : 'failure',
-        type: data.result.tx_result.events.filter((x: any) => x.type === 'message')[0].attributes.filter((x: any) => x.key === 'action')[0].value,
+        type: data.result.tx_result.events.filter((x: any) => x.type === 'message')[0]?.attributes.filter((x: any) => x.key === 'action')[0].value,
         rawData: data.result.tx,
-        rawFullTxData: JSON.stringify(data.result, null, 2),
+        rawFullTxData: data.result,
     }
 });
 
@@ -109,11 +109,15 @@ const GetErc20Output = (tx: MsgExecuteStateChanges) => {
                 #{{ transactionData?.[txHash]?.height }}</RouterLink>
         </p>
         <p>Status: <span v-if="transactionData?.[txHash]?.status === 'success'" class="text-green-500">Success</span>
-            <span v-else class="text-red-500">Failure</span>
+            <span v-else>Failure</span>
         </p>
+        <pre
+            v-if="transactionData?.[txHash]?.status === 'failure'">{{ transactionData?.[txHash]?.rawFullTxData?.tx_result?.log || 'Unknown error' }}</pre>
         <div class="my-4" v-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgRegisterContract'">
-            <p>Contract registration for &quot;{{ getParsedTx<MsgRegisterContract>
-            (transactionData?.[txHash]).contractName }}&quot;
+            <p>Contract registration for <RouterLink
+                    :to="{ name: 'contract', params: { contract_name: getParsedTx<MsgRegisterContract>(transactionData?.[txHash]).contractName } }">
+                    {{ getParsedTx<MsgRegisterContract>
+            (transactionData?.[txHash]).contractName }}</RouterLink>
             </p>
             <p>Initial state: {{ Array.from(getParsedTx<MsgRegisterContract>
             (transactionData?.[txHash]).stateDigest).map(x => x.toString(16).padStart(2, '0')).join('') }}</p>
