@@ -13,6 +13,7 @@ import { network } from '@/explorer/network';
 
 <style scoped>
 select {
-    @apply bg-gray-900 rounded-lg py-1 px-2 font-anton uppercase text-sm;
+    @apply bg-gray-900 rounded-lg py-2 px-4 font-anton uppercase text-secondary;
+
 }
 </style>

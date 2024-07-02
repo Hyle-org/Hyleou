@@ -14,7 +14,7 @@ watchEffect(async () => {
         contracts.value = (await response.json()).contracts;
     }
     {
-        const response = await fetch(`${getNetworkRpcUrl(network.value)}/blockchain`);
+        const response = await fetch(`${getNetworkRpcUrl(network.value)}/blockchain?no_cache=${Date.now()}`);
         blocks.value = (await response.json()).result.block_metas;
     }
     {
