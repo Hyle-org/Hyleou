@@ -17,6 +17,7 @@ type TransactionInfo = {
     height: number;
     status: 'success' | 'failure';
     type: '/hyle.zktx.v1.MsgRegisterContract' | string;
+    proofData: string;
     rawData: string;
     rawFullTxData: any;
 }
@@ -30,6 +31,7 @@ onMounted(async () => {
         height: data.result.height,
         status: data.result.tx_result.code === 0 ? 'success' : 'failure',
         type: data.result.tx_result.events.filter((x: any) => x.type === 'message')[0]?.attributes.filter((x: any) => x.key === 'action')[0].value,
+        proofData: data.result.tx_result.events.filter((x: any) => x.type === 'hyle.zktx.v1.EventStateChange')[0]?.attributes.filter((x: any) => x.key === 'proof_data')[0].value,
         rawData: data.result.tx,
         rawFullTxData: data.result,
     }
@@ -125,7 +127,8 @@ const GetErc20Output = (tx: MsgExecuteStateChanges) => {
         <div class="my-4" v-else-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgExecuteStateChanges'">
             <p>State changes execution</p>
             <p>{{ (parsedTx as xTx).stateChanges.map(x => x.contractName) }}</p>
-            <p>Proof outputs: {{ GetErc20Output(parsedTx as xTx) }}</p>
+            <p>Raw proof outputs: {{ JSON.parse(transactionData?.[txHash]?.proofData) }}</p>
+            <p>ERC 20 outputs: {{ GetErc20Output(parsedTx as xTx) }}</p>
         </div>
         <!--<p>Raw data: <code class="break-all font-mono text-sm">{{ transactionData?.[txHash]?.rawData }}</code></p>-->
         <Toggle>

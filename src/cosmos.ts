@@ -1,9 +1,9 @@
-import {
+import type {
     AccountData,
     DirectSecp256k1HdWallet,
     Registry,
 } from "@cosmjs/proto-signing";
-import { SigningStargateClient, defaultRegistryTypes } from "@cosmjs/stargate";
+import type { SigningStargateClient } from "@cosmjs/stargate";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 // A message type auto-generated from .proto files using ts-proto. @cosmjs/stargate ships some
@@ -11,7 +11,6 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 // for the types you care about. How this is done should be documented, but is not yet:
 // https://github.com/cosmos/cosmjs/issues/640
 import { MsgExecuteStateChanges, MsgRegisterContract } from "./proto/tx.ts";
-import { ref } from "vue";
 
 const mnemonic =
     "surround miss nominee dream gap cross assault thank captain prosper drop duty group candy wealth weather scale put";
@@ -21,6 +20,11 @@ let firstAccount: AccountData;
 
 export async function setupCosmos(address: string) {
     if (client) return;
+
+    const { DirectSecp256k1HdWallet, Registry } = await import(
+        "@cosmjs/proto-signing"
+    );
+    const { SigningStargateClient } = await import("@cosmjs/stargate");
 
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
         prefix: "hyle",
@@ -33,7 +37,6 @@ export async function setupCosmos(address: string) {
         wallet,
         {
             registry: new Registry([
-                ...defaultRegistryTypes,
                 [
                     "/hyle.zktx.v1.MsgExecuteStateChanges",
                     MsgExecuteStateChanges,
