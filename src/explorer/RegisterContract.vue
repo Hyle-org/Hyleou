@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { checkContractExists, checkTxStatus, registerContract, setupCosmos } from '@/cosmos';
 import Header from '@/explorer/Header.vue'
-import { DeliverTxResponse } from '@cosmjs/stargate';
 import { ref } from 'vue';
 
 const isCosmosReady = setupCosmos("http://localhost:26657");
