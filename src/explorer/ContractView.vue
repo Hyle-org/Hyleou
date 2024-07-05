@@ -64,7 +64,8 @@ const executeSC = async () => {
         <h1 class="my-4">{{ contract_name }} contract</h1>
         <p>Powered by <span class="font-anton text-sm">{{ contractData?.[contract_name]?.verifier }}</span></p>
         <p>Program ID: <code
-                class="font-mono text-sm">{{ parseBase64(contractData?.[contract_name]?.program_id) }}</code></p>
+                class="align-text-bottom inline-block font-mono text-sm break-all max-h-[100px] overflow-scroll">{{ parseBase64(contractData?.[contract_name]?.program_id) }}</code>
+        </p>
         <p>State digest: <code class="font-mono text-sm">{{ parseBase64(contractData?.[contract_name]?.state_digest)
             }}</code></p>
         <div class="my-4">

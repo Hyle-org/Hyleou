@@ -3,7 +3,7 @@ import { network } from '@/explorer/network';
 </script>
 
 <template>
-    <div>
+    <div class="h-full">
         <select v-model="network">
             <option value="devnet">Devnet</option>
             <option value="localhost">Localhost</option>
@@ -13,6 +13,6 @@ import { network } from '@/explorer/network';
 
 <style scoped>
 select {
-    @apply bg-gray-900 rounded-lg py-2 px-4 font-anton uppercase text-secondary;
+    @apply bg-gray-900 rounded-lg py-2 px-4 m-0 h-full font-anton uppercase text-secondary;
 }
 </style>

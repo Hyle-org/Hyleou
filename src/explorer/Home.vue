@@ -28,7 +28,7 @@ watchEffect(async () => {
 <template>
     <div class="container m-auto">
         <Header></Header>
-        <div>
+        <div class="px-4">
             <h1 class="my-4">Explorer</h1>
             <div class="my-2">
                 <h2>Contracts</h2>

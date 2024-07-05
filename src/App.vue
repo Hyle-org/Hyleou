@@ -63,7 +63,7 @@ i.spinner {
 input,
 select,
 textarea {
-    @apply text-primary font-mono p-2 rounded-lg;
+    @apply text-primary font-mono p-2 rounded-lg leading-snug;
 }
 
 input[type="file"] {

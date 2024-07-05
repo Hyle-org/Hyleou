@@ -105,35 +105,39 @@ const GetErc20Output = (tx: MsgExecuteStateChanges) => {
 <template>
     <div class="container m-auto">
         <Header></Header>
-        <h1 class="my-4">Transaction 0x{{ txHash }}</h1>
-        <p>Settled in <RouterLink
-                :to="{ name: 'block', params: { block_id: transactionData?.[txHash]?.height || '0' } }">block
-                #{{ transactionData?.[txHash]?.height }}</RouterLink>
-        </p>
-        <p>Status: <span v-if="transactionData?.[txHash]?.status === 'success'" class="text-green-500">Success</span>
-            <span v-else>Failure</span>
-        </p>
-        <pre
-            v-if="transactionData?.[txHash]?.status === 'failure'">{{ transactionData?.[txHash]?.rawFullTxData?.tx_result?.log || 'Unknown error' }}</pre>
-        <div class="my-4" v-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgRegisterContract'">
-            <p>Contract registration for <RouterLink
-                    :to="{ name: 'contract', params: { contract_name: getParsedTx<MsgRegisterContract>(transactionData?.[txHash]).contractName } }">
-                    {{ getParsedTx<MsgRegisterContract>
-            (transactionData?.[txHash]).contractName }}</RouterLink>
+        <div class="px-4">
+            <h1 class="my-4 break-all">Transaction 0x{{ txHash }}</h1>
+            <p>Settled in <RouterLink
+                    :to="{ name: 'block', params: { block_id: transactionData?.[txHash]?.height || '0' } }">block
+                    #{{ transactionData?.[txHash]?.height }}</RouterLink>
             </p>
-            <p>Initial state: {{ Array.from(getParsedTx<MsgRegisterContract>
-            (transactionData?.[txHash]).stateDigest).map(x => x.toString(16).padStart(2, '0')).join('') }}</p>
+            <p>Status: <span v-if="transactionData?.[txHash]?.status === 'success'"
+                    class="text-green-500">Success</span>
+                <span v-else>Failure</span>
+            </p>
+            <pre
+                v-if="transactionData?.[txHash]?.status === 'failure'">{{ transactionData?.[txHash]?.rawFullTxData?.tx_result?.log || 'Unknown error' }}</pre>
+            <div class="my-4" v-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgRegisterContract'">
+                <p>Contract registration for <RouterLink
+                        :to="{ name: 'contract', params: { contract_name: getParsedTx<MsgRegisterContract>(transactionData?.[txHash]).contractName } }">
+                        {{ getParsedTx<MsgRegisterContract>
+                (transactionData?.[txHash]).contractName }}</RouterLink>
+                </p>
+                <p>Initial state: {{ Array.from(getParsedTx<MsgRegisterContract>
+                (transactionData?.[txHash]).stateDigest).map(x => x.toString(16).padStart(2, '0')).join('') }}
+                </p>
+            </div>
+            <div class="my-4" v-else-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgExecuteStateChanges'">
+                <p>State changes execution</p>
+                <p>{{ (parsedTx as xTx).stateChanges.map(x => x.contractName) }}</p>
+                <p>Raw proof outputs: {{ JSON.parse(transactionData?.[txHash]?.proofData) }}</p>
+                <p>ERC 20 outputs: {{ GetErc20Output(parsedTx as xTx) }}</p>
+            </div>
+            <!--<p>Raw data: <code class="break-all font-mono text-sm">{{ transactionData?.[txHash]?.rawData }}</code></p>-->
+            <Toggle>
+                <code
+                    class="break-all w-full my-4 text-sm font-mono whitespace-pre">{{ transactionData?.[txHash]?.rawFullTxData }}</code>
+            </Toggle>
         </div>
-        <div class="my-4" v-else-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgExecuteStateChanges'">
-            <p>State changes execution</p>
-            <p>{{ (parsedTx as xTx).stateChanges.map(x => x.contractName) }}</p>
-            <p>Raw proof outputs: {{ JSON.parse(transactionData?.[txHash]?.proofData) }}</p>
-            <p>ERC 20 outputs: {{ GetErc20Output(parsedTx as xTx) }}</p>
-        </div>
-        <!--<p>Raw data: <code class="break-all font-mono text-sm">{{ transactionData?.[txHash]?.rawData }}</code></p>-->
-        <Toggle>
-            <code
-                class="break-all w-full my-4 text-sm font-mono whitespace-pre">{{ transactionData?.[txHash]?.rawFullTxData }}</code>
-        </Toggle>
     </div>
 </template>
