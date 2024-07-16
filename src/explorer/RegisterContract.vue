@@ -2,8 +2,9 @@
 import { checkContractExists, checkTxStatus, registerContract, setupCosmos } from '@/cosmos';
 import Header from '@/explorer/Header.vue'
 import { ref } from 'vue';
+import { getNetworkRpcUrl, network } from './network';
 
-const isCosmosReady = setupCosmos("http://localhost:26657");
+const isCosmosReady = setupCosmos(`${getNetworkRpcUrl(network.value)}`);
 
 const name = ref<string>('');
 const verifierType = ref<string>('risczero');

@@ -175,10 +175,11 @@ export function base64ToUint8Array(base64: string): Uint8Array {
 import { ref } from "vue";
 import { MsgExecuteStateChanges, MsgRegisterContract } from "./proto/tx.ts";
 import { Tx as CosmosTx } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { getNetworkWebsocketUrl, network } from "./explorer/network.ts";
 
 export async function GetAllStateChanges() {
     const client = await JSONRpcClient.connect(
-        "ws://localhost:26657/websocket",
+        `${getNetworkWebsocketUrl(network.value)}/websocket`,
     );
 
     let messages = ref(
@@ -222,7 +223,7 @@ export function GetAllContractRegistrations() {
 
     (async () => {
         const client = await JSONRpcClient.connect(
-            "ws://localhost:26657/websocket",
+            `${getNetworkWebsocketUrl(network.value)}/websocket`,
         );
         client.searchAndSubscribe(
             "message.action='/hyle.zktx.v1.MsgRegisterContract'",

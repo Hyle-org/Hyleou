@@ -11,6 +11,7 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 // for the types you care about. How this is done should be documented, but is not yet:
 // https://github.com/cosmos/cosmjs/issues/640
 import { MsgExecuteStateChanges, MsgRegisterContract } from "./proto/tx.ts";
+import { getNetworkApiUrl, network } from "./explorer/network.ts";
 
 const mnemonic =
     "surround miss nominee dream gap cross assault thank captain prosper drop duty group candy wealth weather scale put";
@@ -97,7 +98,7 @@ export async function checkTxStatus(hash: string) {
 
 export async function checkContractExists(contractName: string) {
     const checkExists = await fetch(
-        `http://localhost:1317/hyle/zktx/v1/contract/${contractName}`,
+        `${getNetworkApiUrl(network.value)}/hyle/zktx/v1/contract/${contractName}`,
     );
     try {
         return (await checkExists.json()).contract.verifier != "";
