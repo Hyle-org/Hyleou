@@ -7,7 +7,7 @@ import { checkTxStatus, sendExecuteTX, setupCosmos } from '@/cosmos';
 
 const route = useRoute();
 
-const isCosmosReady = setupCosmos("http://localhost:26657");
+const isCosmosReady = setupCosmos(`${getNetworkRpcUrl(network.value)}`);
 
 const contract_name = computed(() => route.params.contract_name as string);
 
