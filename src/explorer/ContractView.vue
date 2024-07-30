@@ -30,7 +30,7 @@ onMounted(async () => {
     const response = await fetch(`${getNetworkApiUrl(network.value)}/hyle/zktx/v1/contract/${contract_name.value}`);
     contractData[contract_name.value] = (await response.json()).contract;
 
-    const txResp = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="hyle.zktx.v1.EventStateChange.contract_name='\\"${contract_name.value}\\"'"&page=1&per_page=10&order_by="desc"&match_events=true`);
+    const txResp = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="hyle.zktx.v1.EventPayload.contract_name='\\"${contract_name.value}\\"'"&page=1&per_page=10&order_by="desc"&match_events=true`);
     transactions.value = (await txResp.json()).result.txs;
 });
 
