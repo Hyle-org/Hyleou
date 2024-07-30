@@ -1,6 +1,7 @@
 import { reactive, ref } from "vue";
 import { getNetworkRpcUrl, getNetworkWebsocketUrl, network } from "./network";
-import { base64ToUint8Array, WebSocketConnection } from "@/indexer";
+import { WebSocketConnection } from "@/indexer";
+import { base64ToUint8Array } from "@/utils";
 
 export type BlockInfo = {
     hash: string;
@@ -20,16 +21,11 @@ export const blocks = ref(
 export const loadBlockData = async (blockIdentifier: string) => {
     if (blockData[blockIdentifier]) return;
 
-    const response = await fetch(
-        `${getNetworkRpcUrl(network.value)}/block?height=${blockIdentifier}`,
-    );
+    const response = await fetch(`${getNetworkRpcUrl(network.value)}/block?height=${blockIdentifier}`);
     const data = await response.json();
 
     let hashes = data.result.block.data.txs.map(async (x: any) => {
-        const hash = await crypto.subtle.digest(
-            "SHA-256",
-            base64ToUint8Array(x),
-        );
+        const hash = await crypto.subtle.digest("SHA-256", base64ToUint8Array(x));
         return Array.from(new Uint8Array(hash))
             .map((x: number) => x.toString(16).padStart(2, "0"))
             .join("");
@@ -45,13 +41,9 @@ export const loadBlockData = async (blockIdentifier: string) => {
 };
 
 const loadBlocks = async () => {
-    const response = await fetch(
-        `${getNetworkRpcUrl(network.value)}/blockchain?no_cache=${Date.now()}`,
-    );
+    const response = await fetch(`${getNetworkRpcUrl(network.value)}/blockchain?no_cache=${Date.now()}`);
     blocks.value = (await response.json()).result.block_metas.reverse();
-    const client = await WebSocketConnection.connect(
-        `${getNetworkWebsocketUrl(network.value)}`,
-    );
+    const client = await WebSocketConnection.connect(`${getNetworkWebsocketUrl(network.value)}`);
     client.call("subscribe", { query: "tm.event='NewBlock'" }, (result) => {
         if (!result.data?.value?.block) return;
         blocks.value.push({

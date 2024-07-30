@@ -2,7 +2,7 @@ import { reactive } from "vue";
 import { getNetworkApiUrl, getNetworkRpcUrl, network } from "./network";
 import { MsgPublishPayloads, MsgRegisterContract } from "@/proto/tx";
 import { Tx as CosmosTx } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { base64ToUint8Array } from "@/indexer";
+import { base64ToUint8Array } from "@/utils";
 
 export type TransactionInfo = {
     hash: string;
@@ -50,7 +50,12 @@ export const loadTransactionData = async (txHash: string) => {
     }
 };
 
-export function getParsedTx<T>(data: TransactionInfo): T {
+interface ParsableTx {
+    type: string;
+    rawData: string;
+}
+
+export function getParsedTx<T>(data: ParsableTx): T {
     const tx = CosmosTx.decode(base64ToUint8Array(data.rawData));
     if (data.type === "/hyle.zktx.v1.MsgRegisterContract") {
         return MsgRegisterContract.decode(
