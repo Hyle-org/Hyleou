@@ -1,22 +1,12 @@
 <script setup lang="ts">
 import Header from '@/explorer/Header.vue'
-import { ref, watchEffect } from 'vue';
-import { getNetworkApiUrl, getNetworkRpcUrl, network } from './network';
+import { computed } from 'vue';
 import { blocks } from './blocks';
+import { transactionData } from './transactions';
+import { contractData } from './contracts';
 
-const contracts = ref([]);
-const transactions = ref([]);
-
-watchEffect(async () => {
-    {
-        const response = await fetch(`${getNetworkApiUrl(network.value)}/hyle/zktx/v1/contracts`);
-        contracts.value = (await response.json()).contracts;
-    }
-    {
-        const response = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="tx.height>=0"&page=1&per_page=10&order_by="desc"`);
-        transactions.value = (await response.json()).result.txs;
-    }
-});
+const contracts = computed(() => Object.keys(contractData));
+const transactions = computed(() => Object.values(transactionData));
 
 </script>
 

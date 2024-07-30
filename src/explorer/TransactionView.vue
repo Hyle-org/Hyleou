@@ -15,7 +15,8 @@ loadTransactionData(txHash.value);
 type regTx = MsgRegisterContract;
 type xTx = MsgPublishPayloads;
 
-const parsedTx = computed(() => getParsedTx(transactionData[txHash.value]));
+const txData = computed(() => transactionData[txHash.value]);
+const parsedTx = computed(() => getParsedTx(txData.value));
 </script>
 
 <template>
@@ -23,32 +24,29 @@ const parsedTx = computed(() => getParsedTx(transactionData[txHash.value]));
         <Header></Header>
         <div class="px-4">
             <h1 class="my-4 break-all">Transaction 0x{{ txHash }}</h1>
-            <p>Settled in <RouterLink
-                    :to="{ name: 'block', params: { block_id: transactionData?.[txHash]?.height || '0' } }">block
-                    #{{ transactionData?.[txHash]?.height }}</RouterLink>
+            <p>Settled in <RouterLink :to="{ name: 'block', params: { block_id: txData?.height || '0' } }">block
+                    #{{ txData?.height }}</RouterLink>
             </p>
-            <p>Status: {{ transactionData?.[txHash]?.status || 'unknown' }}</p>
+            <p>Status: {{ txData?.status || 'unknown' }}</p>
             <pre
-                v-if="transactionData?.[txHash]?.status === 'failure'">{{ transactionData?.[txHash]?.rawFullTxData?.tx_result?.log || 'Unknown error' }}</pre>
-            <div class="my-4" v-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgRegisterContract'">
+                v-if="txData?.status === 'failure'">{{ txData?.rawFullTxData?.tx_result?.log || 'Unknown error' }}</pre>
+            <div class="my-4" v-if="txData?.type === '/hyle.zktx.v1.MsgRegisterContract'">
                 <p>Contract registration for <RouterLink
-                        :to="{ name: 'contract', params: { contract_name: getParsedTx<MsgRegisterContract>(transactionData?.[txHash]).contractName } }">
-                        {{ getParsedTx<MsgRegisterContract>
-                (transactionData?.[txHash]).contractName }}</RouterLink>
+                        :to="{ name: 'contract', params: { contract_name: getParsedTx<MsgRegisterContract>(txData).contractName } }">
+                        {{ getParsedTx<MsgRegisterContract>(txData).contractName }}</RouterLink>
                 </p>
                 <p>Initial state: {{ Array.from(getParsedTx<MsgRegisterContract>
-                (transactionData?.[txHash]).stateDigest).map(x => x.toString(16).padStart(2, '0')).join('') }}
+                (txData).stateDigest).map(x => x.toString(16).padStart(2, '0')).join('') }}
                 </p>
             </div>
-            <div class="my-4" v-else-if="transactionData?.[txHash]?.type === '/hyle.zktx.v1.MsgPublishPayloads'">
+            <div class="my-4" v-else-if="txData?.type === '/hyle.zktx.v1.MsgPublishPayloads'">
                 <p>Payload</p>
                 <p>{{ (parsedTx as xTx).payloads.map(x => x.contractName) }}</p>
                 <p>{{ (parsedTx as xTx).payloads.map(x => x.data) }}</p>
             </div>
-            <!--<p>Raw data: <code class="break-all font-mono text-sm">{{ transactionData?.[txHash]?.rawData }}</code></p>-->
+            <!--<p>Raw data: <code class="break-all font-mono text-sm">{{ txData?.rawData }}</code></p>-->
             <Toggle>
-                <code
-                    class="break-all w-full my-4 text-sm font-mono whitespace-pre">{{ transactionData?.[txHash]?.rawFullTxData }}</code>
+                <code class="break-all w-full my-4 text-sm font-mono whitespace-pre">{{ txData?.rawFullTxData }}</code>
             </Toggle>
         </div>
     </div>

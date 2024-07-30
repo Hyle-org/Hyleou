@@ -12,6 +12,7 @@ export type TransactionInfo = {
         | "/hyle.zktx.v1.MsgRegisterContract"
         | "/hyle.zktx.v1.MsgPublishPayloads"
         | "/hyle.zktx.v1.MsgPublishPayloadProof";
+    contracts: string[];
     rawData: string;
     rawFullTxData: any;
 };
@@ -21,7 +22,7 @@ export const transactionData = reactive({} as Record<string, TransactionInfo>);
 export const settledTxData = reactive({} as Record<string, boolean>);
 
 export const loadTransactionData = async (txHash: string) => {
-    if (transactionData[txHash]) return;
+    if (transactionData[txHash]?.type) return; // use type as a proxy for full loading (see below)
 
     const response = fetch(
         `${getNetworkRpcUrl(network.value)}/tx?hash=0x${txHash}`,
@@ -45,7 +46,23 @@ export const loadTransactionData = async (txHash: string) => {
             ?.attributes.filter((x: any) => x.key === "action")[0].value,
         rawData: data.result.tx,
         rawFullTxData: data.result,
+        contracts: [],
     };
+    const parsed = getParsedTx(transactionData[txHash]);
+    // Find out which contract this tx is related to
+    if (transactionData[txHash].type === "/hyle.zktx.v1.MsgRegisterContract") {
+        transactionData[txHash].contracts = [
+            (parsed as MsgRegisterContract).contractName,
+        ];
+    } else if (
+        transactionData[txHash].type === "/hyle.zktx.v1.MsgPublishPayloads"
+    ) {
+        transactionData[txHash].contracts = (
+            parsed as MsgPublishPayloads
+        ).payloads.map((x) => x.contractName);
+    } else {
+        // TODO settlement ?
+    }
 };
 
 export function getParsedTx<T>(data: TransactionInfo): T {
@@ -65,3 +82,39 @@ export function getParsedTx<T>(data: TransactionInfo): T {
     }
     return undefined as any;
 }
+
+export const loadTxData = async () => {
+    const response = await fetch(
+        `${getNetworkRpcUrl(network.value)}/tx_search?query="tx.height>=0"&page=1&per_page=10&order_by="desc"`,
+    );
+    const txs = /*transactions.value = */ (await response.json()).result.txs;
+    for (const tx of txs) {
+        // HACK
+        transactionData[tx.hash] = {
+            hash: tx.hash,
+            height: tx.height,
+        };
+    }
+};
+
+export const loadContractTxs = async (
+    network: string,
+    contract_name: string,
+) => {
+    // TODO: load register TXs as well
+    const response = await fetch(
+        `${getNetworkRpcUrl(network)}/tx_search?query="hyle.zktx.v1.EventPayload.contract_name='\\"${contract_name}\\"'"&page=1&per_page=10&order_by="desc"&match_events=true`,
+    );
+    const txs = /*transactions.value = */ (await response.json()).result.txs;
+    for (const tx of txs) {
+        // HACK
+        transactionData[tx.hash] = {
+            hash: tx.hash,
+            height: tx.height,
+            contracts: [contract_name],
+        };
+    }
+};
+
+// Load the latest by default
+loadTxData();
