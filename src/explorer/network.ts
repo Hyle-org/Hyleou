@@ -10,7 +10,10 @@ class LocalStorageService {
             const jsonValue = localStorage.getItem(key);
             if (jsonValue) return JSON.parse(jsonValue) as T;
         } catch (_) {
-            localStorage.removeItem(key);
+            // Might not exist in test envs
+            try {
+                localStorage.removeItem(key);
+            } catch (_) {}
         }
         return null;
     }

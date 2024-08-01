@@ -16,8 +16,6 @@ export type TransactionInfo = {
 
 export const transactionData = reactive({} as Record<string, TransactionInfo>);
 
-export const settledTxData = reactive({} as Record<string, boolean>);
-
 export const loadTransactionData = async (txHash: string) => {
     if (transactionData[txHash]?.type) return; // use type as a proxy for full loading (see below)
 

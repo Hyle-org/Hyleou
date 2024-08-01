@@ -1,43 +1,24 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { ref, computed, reactive, watchEffect } from 'vue';
 import { Erc20Parser } from './erc20';
-import { base64ToUint8Array } from '@/utils';
-
-
+import { transactionData } from './transactions';
 const props = defineProps<{
     contract_name: string;
 }>();
 
-const contractData = reactive(new Erc20Parser(props.contract_name));
+const transactions = computed(() => Object.values(transactionData).filter(tx => tx.contracts?.includes(props.contract_name)));
 
-contractData.balancesSettled['faucet'] = 1000000;
-contractData.balancesSettled['jojo'] = 2453;
-const payload = "WzcgMCAxMTI1Njg3NjczMDkxNzIgNiAwIDE1NTQ5ODI0NDMzMDQ4ODA0NTMwNjg1MDI4NzU4OTY2NDE3NzIwMDY3MjAwMzIyNDExMyAyMSAxMDAwXQ==";
-const data = base64ToUint8Array(payload);
-contractData.consumeSettledMsg({
-    payloads: [
-        {
-            contractName: props.contract_name,
-            data,
-        },
-    ],
-}, '0x1234');
-contractData.consumePendingMsg({
-    payloads: [
-        {
-            contractName: props.contract_name,
-            data,
-        },
-    ],
-}, '0x12343');
-contractData.consumePendingMsg({
-    payloads: [
-        {
-            contractName: props.contract_name,
-            data,
-        },
-    ],
-}, '0x12345');
+const contractData = ref(new Erc20Parser(props.contract_name));
+
+watchEffect(() => {
+    contractData.value = reactive(new Erc20Parser(props.contract_name));
+    transactions.value.forEach(tx => {
+        contractData.value.consumeTx(tx);
+        if (tx.status !== "sequenced") contractData.value.settleTx(tx.hash, tx.status === "success");
+    });
+});
+
+
 </script>
 
 <template>

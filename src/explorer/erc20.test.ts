@@ -18,21 +18,42 @@ test("deserByteArray", () => {
     ).toBe("jenny.ecdsa_secp256r1jenny.ecdsa_secp256r1jenny.ecdsa_secp256r1");
 });
 
-test("Parse TX", () => {
+test("Process pending and settled correctly", () => {
+    const contract = new Erc20Parser();
+
     const payload = "WzcgMCAxMTI1Njg3NjczMDkxNzIgNiAwIDE1NTQ5ODI0NDMzMDQ4ODA0NTMwNjg1MDI4NzU4OTY2NDE3NzIwMDY3MjAwMzIyNDExMyAyMSAxMDAwXQ==";
     const data = new Uint8Array(Buffer.from(payload, "base64"));
-    const contract = new Erc20Parser();
-    contract.consumeSettledMsg(
-        {
-            payloads: [
-                {
-                    contractName: "erc20",
-                    data,
-                },
-            ],
-        },
-        "fakeTx",
-    );
-    expect(contract.balancesSettled["faucet"]).toBe(-1000);
+    const parsedPayload = {
+        identity: "0x1234",
+        payloads: [
+            {
+                contractName: contract.contractName,
+                data,
+            },
+        ],
+    };
+
+    expect(contract.balancesSettled).toEqual({});
+    expect(contract.balancesPending).toEqual({});
+    contract.balancesSettled["faucet"] = 100000;
+
+    contract.consumePayload(parsedPayload, "1");
+    contract.consumePayload(parsedPayload, "2");
+    expect(contract.balancesSettled["faucet"]).toBe(100000);
+    expect(contract.balancesPending["faucet"]).toBe(98000);
+    expect(contract.balancesPending["jenny.ecdsa_secp256r1"]).toBe(2000);
+    contract.consumePayload(parsedPayload, "3");
+    contract.settleTx("1", true);
+    expect(contract.balancesSettled["faucet"]).toBe(99000);
     expect(contract.balancesSettled["jenny.ecdsa_secp256r1"]).toBe(1000);
+    expect(contract.balancesPending["faucet"]).toBe(98000);
+    expect(contract.balancesPending["jenny.ecdsa_secp256r1"]).toBe(2000);
+    contract.settleTx("2", false);
+    expect(contract.balancesSettled["faucet"]).toBe(99000);
+    expect(contract.balancesSettled["jenny.ecdsa_secp256r1"]).toBe(1000);
+    expect(contract.balancesPending["faucet"]).toBe(99000);
+    expect(contract.balancesPending["jenny.ecdsa_secp256r1"]).toBe(1000);
+    contract.settleTx("3", true);
+    expect(contract.balancesSettled["faucet"]).toBe(98000);
+    expect(contract.balancesSettled["jenny.ecdsa_secp256r1"]).toBe(2000);
 });
