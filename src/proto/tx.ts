@@ -19,6 +19,8 @@ export interface Payload {
 
 /** execute a zk-proven state change - request type */
 export interface MsgPublishPayloads {
+  /** Identity is the identity of the TX sender */
+  identity: string;
   /** list of payloads */
   payloads: Payload[];
 }
@@ -33,10 +35,8 @@ export interface MsgPublishPayloadProof {
   txHash: Uint8Array;
   /** Index of the payload in the tx */
   payloadIndex: number;
-  /** Name of target contract */
+  /** Contract name */
   contractName: string;
-  /** Hash of the payload */
-  payloadHash: Uint8Array;
   /** Proof of the payload */
   proof: Uint8Array;
 }
@@ -138,13 +138,16 @@ export const Payload = {
 };
 
 function createBaseMsgPublishPayloads(): MsgPublishPayloads {
-  return { payloads: [] };
+  return { identity: "", payloads: [] };
 }
 
 export const MsgPublishPayloads = {
   encode(message: MsgPublishPayloads, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.identity !== "") {
+      writer.uint32(10).string(message.identity);
+    }
     for (const v of message.payloads) {
-      Payload.encode(v!, writer.uint32(10).fork()).ldelim();
+      Payload.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -161,6 +164,13 @@ export const MsgPublishPayloads = {
             break;
           }
 
+          message.identity = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
           message.payloads.push(Payload.decode(reader, reader.uint32()));
           continue;
       }
@@ -174,12 +184,16 @@ export const MsgPublishPayloads = {
 
   fromJSON(object: any): MsgPublishPayloads {
     return {
+      identity: isSet(object.identity) ? globalThis.String(object.identity) : "",
       payloads: globalThis.Array.isArray(object?.payloads) ? object.payloads.map((e: any) => Payload.fromJSON(e)) : [],
     };
   },
 
   toJSON(message: MsgPublishPayloads): unknown {
     const obj: any = {};
+    if (message.identity !== "") {
+      obj.identity = message.identity;
+    }
     if (message.payloads?.length) {
       obj.payloads = message.payloads.map((e) => Payload.toJSON(e));
     }
@@ -191,6 +205,7 @@ export const MsgPublishPayloads = {
   },
   fromPartial<I extends Exact<DeepPartial<MsgPublishPayloads>, I>>(object: I): MsgPublishPayloads {
     const message = createBaseMsgPublishPayloads();
+    message.identity = object.identity ?? "";
     message.payloads = object.payloads?.map((e) => Payload.fromPartial(e)) || [];
     return message;
   },
@@ -240,13 +255,7 @@ export const MsgPublishPayloadsResponse = {
 };
 
 function createBaseMsgPublishPayloadProof(): MsgPublishPayloadProof {
-  return {
-    txHash: new Uint8Array(0),
-    payloadIndex: 0,
-    contractName: "",
-    payloadHash: new Uint8Array(0),
-    proof: new Uint8Array(0),
-  };
+  return { txHash: new Uint8Array(0), payloadIndex: 0, contractName: "", proof: new Uint8Array(0) };
 }
 
 export const MsgPublishPayloadProof = {
@@ -260,11 +269,8 @@ export const MsgPublishPayloadProof = {
     if (message.contractName !== "") {
       writer.uint32(26).string(message.contractName);
     }
-    if (message.payloadHash.length !== 0) {
-      writer.uint32(34).bytes(message.payloadHash);
-    }
     if (message.proof.length !== 0) {
-      writer.uint32(42).bytes(message.proof);
+      writer.uint32(34).bytes(message.proof);
     }
     return writer;
   },
@@ -302,13 +308,6 @@ export const MsgPublishPayloadProof = {
             break;
           }
 
-          message.payloadHash = reader.bytes();
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
           message.proof = reader.bytes();
           continue;
       }
@@ -325,7 +324,6 @@ export const MsgPublishPayloadProof = {
       txHash: isSet(object.txHash) ? bytesFromBase64(object.txHash) : new Uint8Array(0),
       payloadIndex: isSet(object.payloadIndex) ? globalThis.Number(object.payloadIndex) : 0,
       contractName: isSet(object.contractName) ? globalThis.String(object.contractName) : "",
-      payloadHash: isSet(object.payloadHash) ? bytesFromBase64(object.payloadHash) : new Uint8Array(0),
       proof: isSet(object.proof) ? bytesFromBase64(object.proof) : new Uint8Array(0),
     };
   },
@@ -341,9 +339,6 @@ export const MsgPublishPayloadProof = {
     if (message.contractName !== "") {
       obj.contractName = message.contractName;
     }
-    if (message.payloadHash.length !== 0) {
-      obj.payloadHash = base64FromBytes(message.payloadHash);
-    }
     if (message.proof.length !== 0) {
       obj.proof = base64FromBytes(message.proof);
     }
@@ -358,7 +353,6 @@ export const MsgPublishPayloadProof = {
     message.txHash = object.txHash ?? new Uint8Array(0);
     message.payloadIndex = object.payloadIndex ?? 0;
     message.contractName = object.contractName ?? "";
-    message.payloadHash = object.payloadHash ?? new Uint8Array(0);
     message.proof = object.proof ?? new Uint8Array(0);
     return message;
   },
