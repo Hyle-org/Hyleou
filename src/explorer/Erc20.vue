@@ -6,7 +6,11 @@ const props = defineProps<{
     contract_name: string;
 }>();
 
-const transactions = computed(() => Object.values(transactionData).filter(tx => tx.contracts?.includes(props.contract_name)));
+const transactions = computed(() => {
+    const txs = Object.values(transactionData).filter(tx => tx.contracts?.includes(props.contract_name))
+    txs.sort((a, b) => a.height - b.height + a.index - b.index);
+    return txs;
+});
 
 const contractData = ref(new Erc20Parser(props.contract_name));
 
