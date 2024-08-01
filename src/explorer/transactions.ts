@@ -68,6 +68,7 @@ export const loadTxData = async () => {
     const response = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="tx.height>=0"&page=1&per_page=10&order_by="desc"`);
     const txs = /*transactions.value = */ (await response.json()).result.txs;
     for (const tx of txs) {
+        if (!!transactionData[tx.hash]) continue;
         // HACK
         transactionData[tx.hash] = {
             hash: tx.hash,
@@ -83,6 +84,7 @@ export const loadContractTxs = async (network: string, contract_name: string) =>
     );
     const txs = /*transactions.value = */ (await response.json()).result.txs;
     for (const tx of txs) {
+        if (!!transactionData[tx.hash]) continue;
         // HACK
         transactionData[tx.hash] = {
             hash: tx.hash,
