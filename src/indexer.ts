@@ -44,9 +44,7 @@ export class WebSocketConnection {
 
     private async attemptReconnect() {
         if (this.reconnectAttempts < 3) {
-            await new Promise((resolve) =>
-                setTimeout(resolve, Math.pow(2, this.reconnectAttempts) * 1000),
-            );
+            await new Promise((resolve) => setTimeout(resolve, Math.pow(2, this.reconnectAttempts) * 1000));
             this.reconnectAttempts++;
             await this.connectWebSocket();
         } else {
@@ -92,15 +90,11 @@ class JSONRpcClient extends WebSocketConnection {
 
     private async search(query: string, handler: (result: any) => void) {
         const total_count = await new Promise<number>((resolve) => {
-            this.call(
-                "tx_search",
-                { query, per_page: `${this.MAX_PAGE_SIZE}`, order_by: "desc" },
-                (result) => {
-                    handler(result);
-                    this.onNewTx(this);
-                    resolve(+result.total_count);
-                },
-            );
+            this.call("tx_search", { query, per_page: `${this.MAX_PAGE_SIZE}`, order_by: "desc" }, (result) => {
+                handler(result);
+                this.onNewTx(this);
+                resolve(+result.total_count);
+            });
         });
         // Search results are paginated, so we need to fetch all pages
         for (let i = 1; i * this.MAX_PAGE_SIZE < total_count; i++) {
@@ -138,10 +132,7 @@ class JSONRpcClient extends WebSocketConnection {
         });
     }
 
-    async searchAndSubscribe(
-        query: string,
-        onNewTx: (client: JSONRpcClient) => void,
-    ) {
+    async searchAndSubscribe(query: string, onNewTx: (client: JSONRpcClient) => void) {
         this.onNewTx = onNewTx;
         this.subscribe(query);
         // TODO: It's possible that we actually miss some TX between subscribe and search
@@ -162,25 +153,14 @@ class JSONRpcClient extends WebSocketConnection {
     }
 }
 
-export function base64ToUint8Array(base64: string): Uint8Array {
-    const binaryString = atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes;
-}
-
 import { ref } from "vue";
 import { MsgPublishPayloadProof, MsgRegisterContract } from "./proto/tx.ts";
 import { Tx as CosmosTx } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { getNetworkWebsocketUrl, network } from "./explorer/network.ts";
+import { base64ToUint8Array } from "@/utils.ts";
 
 export async function GetAllStateChanges() {
-    const client = await JSONRpcClient.connect(
-        `${getNetworkWebsocketUrl(network.value)}/websocket`,
-    );
+    const client = await JSONRpcClient.connect(`${getNetworkWebsocketUrl(network.value)}/websocket`);
 
     let messages = ref(
         [] as {
@@ -190,24 +170,21 @@ export async function GetAllStateChanges() {
         }[],
     );
 
-    client.searchAndSubscribe(
-        "message.action='/hyle.zktx.v1.MsgPublishPayloadProof'",
-        (client) => {
-            messages.value = [];
-            const results = client.getResults();
-            results.map((tx) => {
-                const txRaw = base64ToUint8Array(tx.tx);
-                const txData = CosmosTx.decode(txRaw);
-                txData.body?.messages?.map((msg) => {
-                    messages.value.push({
-                        height: tx.height,
-                        txhash: tx.txhash,
-                        messages: MsgPublishPayloadProof.decode(msg.value),
-                    });
+    client.searchAndSubscribe("message.action='/hyle.zktx.v1.MsgPublishPayloadProof'", (client) => {
+        messages.value = [];
+        const results = client.getResults();
+        results.map((tx) => {
+            const txRaw = base64ToUint8Array(tx.tx);
+            const txData = CosmosTx.decode(txRaw);
+            txData.body?.messages?.map((msg) => {
+                messages.value.push({
+                    height: tx.height,
+                    txhash: tx.txhash,
+                    messages: MsgPublishPayloadProof.decode(msg.value),
                 });
             });
-        },
-    );
+        });
+    });
 
     return messages;
 }
@@ -222,27 +199,22 @@ export function GetAllContractRegistrations() {
     );
 
     (async () => {
-        const client = await JSONRpcClient.connect(
-            `${getNetworkWebsocketUrl(network.value)}/websocket`,
-        );
-        client.searchAndSubscribe(
-            "message.action='/hyle.zktx.v1.MsgRegisterContract'",
-            (client) => {
-                registerMsgs.value = [];
-                const results = client.getResults();
-                results.map((tx) => {
-                    const txRaw = base64ToUint8Array(tx.tx);
-                    const txData = CosmosTx.decode(txRaw);
-                    txData.body?.messages?.map((msg) => {
-                        registerMsgs.value.push({
-                            height: tx.height,
-                            txhash: tx.txhash,
-                            messages: MsgRegisterContract.decode(msg.value),
-                        });
+        const client = await JSONRpcClient.connect(`${getNetworkWebsocketUrl(network.value)}/websocket`);
+        client.searchAndSubscribe("message.action='/hyle.zktx.v1.MsgRegisterContract'", (client) => {
+            registerMsgs.value = [];
+            const results = client.getResults();
+            results.map((tx) => {
+                const txRaw = base64ToUint8Array(tx.tx);
+                const txData = CosmosTx.decode(txRaw);
+                txData.body?.messages?.map((msg) => {
+                    registerMsgs.value.push({
+                        height: tx.height,
+                        txhash: tx.txhash,
+                        messages: MsgRegisterContract.decode(msg.value),
                     });
                 });
-            },
-        );
+            });
+        });
     })();
 
     return registerMsgs;
