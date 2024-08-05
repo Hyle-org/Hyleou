@@ -2,10 +2,10 @@
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { getNetworkRpcUrl, network } from './network';
-import { checkTxStatus, sendExecuteTX, setupCosmos } from '@/cosmos';
-import { contractData, loadContractData } from './contracts';
-import { transactionData } from './transactions';
+import { getNetworkRpcUrl, network } from 'hyle-js';
+import { checkTxStatus, sendExecuteTX, setupCosmos } from 'hyle-js';
+import { contractData, loadContractData } from 'hyle-js';
+import { transactionData } from 'hyle-js';
 import Erc20Vue from './Erc20.vue';
 
 const route = useRoute();
@@ -57,7 +57,7 @@ const executeSC = async () => {
         </p>
         <p>State digest: <code class="font-mono text-sm">{{ parseBase64(contractData?.[contract_name]?.state_digest)
             }}</code></p>
-        <div v-if="contract_name === 'fake-erc20'" class="my-4">
+        <div v-if="contract_name === 'fake-erc20' || contract_name === 'smile_token'" class="my-4">
             <Erc20Vue :contract_name="contract_name"></Erc20Vue>
         </div>
         <div class="my-4">
@@ -85,3 +85,4 @@ const executeSC = async () => {
         </div>
     </div>
 </template>
+../../../hyle-js/src/network../../../hyle-js/src/transactions

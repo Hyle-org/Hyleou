@@ -5,8 +5,12 @@ import vue from "@vitejs/plugin-vue";
 import { visualizer } from "rollup-plugin-visualizer";
 import analyze from "rollup-plugin-analyzer";
 
+let root = fileURLToPath(new URL("./", import.meta.url));
+if (!root.endsWith("/packages/hyleou/")) root += "/packages/hyleou/";
+
 // https://vitejs.dev/config/
 export default defineConfig({
+    root,
     server: {
         host: true,
         port: 8000,

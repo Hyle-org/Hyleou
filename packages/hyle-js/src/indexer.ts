@@ -156,7 +156,7 @@ class JSONRpcClient extends WebSocketConnection {
 import { ref } from "vue";
 import { MsgPublishPayloadProof, MsgRegisterContract } from "./proto/tx.ts";
 import { Tx as CosmosTx } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { getNetworkWebsocketUrl, network } from "./explorer/network.ts";
+import { getNetworkWebsocketUrl, network } from "./network.ts";
 import { base64ToUint8Array } from "@/utils.ts";
 
 export async function GetAllStateChanges() {

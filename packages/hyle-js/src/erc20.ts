@@ -1,4 +1,4 @@
-import { MsgPublishPayloads } from "@/proto/tx";
+import { MsgPublishPayloads } from "./proto/tx";
 import { getParsedTx, TransactionInfo } from "./transactions";
 
 function decimalToAscii(encodedString: string) {
@@ -48,11 +48,10 @@ export class Erc20Parser {
             // Parse payload data as ascii
             const parsed = new TextDecoder().decode(payload.data);
             const felts = parsed.slice(1, -1).split(" ");
-            // First item is array length, ignore
-            const fromSize = parseInt(felts[1]);
-            const from = deserByteArray(felts.slice(1, 1 + fromSize + 3));
-            const toSize = parseInt(felts[4 + fromSize]);
-            const to = deserByteArray(felts.slice(4 + fromSize, 4 + fromSize + toSize + 3));
+            const fromSize = parseInt(felts[0]);
+            const from = deserByteArray(felts.slice(0, fromSize + 3));
+            const toSize = parseInt(felts[3 + fromSize]);
+            const to = deserByteArray(felts.slice(3 + fromSize, 3 + fromSize + toSize + 3));
             const amount = parseInt(felts.slice(-1)[0]);
             // Update balances
             this.balancesPending[from] = (this.balancesPending[from] || this.balancesSettled[from] || 0) - amount;
@@ -73,10 +72,10 @@ export class Erc20Parser {
             const parsed = new TextDecoder().decode(payload.data);
             const felts = parsed.slice(1, -1).split(" ");
             // First item is array length, ignore
-            const fromSize = parseInt(felts[1]);
-            const from = deserByteArray(felts.slice(1, 1 + fromSize + 3));
-            const toSize = parseInt(felts[4 + fromSize]);
-            const to = deserByteArray(felts.slice(4 + fromSize, 4 + fromSize + toSize + 3));
+            const fromSize = parseInt(felts[0]);
+            const from = deserByteArray(felts.slice(0, fromSize + 3));
+            const toSize = parseInt(felts[3 + fromSize]);
+            const to = deserByteArray(felts.slice(3 + fromSize, 3 + fromSize + toSize + 3));
             const amount = parseInt(felts.slice(-1)[0]);
             this.balancesPending[from] = (this.balancesPending[from] || 0) + amount;
             this.balancesPending[to] = (this.balancesPending[to] || 0) - amount;

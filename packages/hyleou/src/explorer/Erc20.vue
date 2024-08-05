@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive, watchEffect } from 'vue';
-import { Erc20Parser } from './erc20';
-import { transactionData } from './transactions';
+import { Erc20Parser } from 'hyle-js';
+import { loadTransactionData, transactionData } from 'hyle-js';
 const props = defineProps<{
     contract_name: string;
 }>();
@@ -17,6 +17,10 @@ const contractData = ref(new Erc20Parser(props.contract_name));
 watchEffect(() => {
     contractData.value = reactive(new Erc20Parser(props.contract_name));
     transactions.value.forEach(tx => {
+        if (!tx.type) {
+            loadTransactionData(tx.hash); // inefficient if we do this many times.
+            return;
+        }
         contractData.value.consumeTx(tx);
         if (tx.status !== "sequenced") contractData.value.settleTx(tx.hash, tx.status === "success");
     });
@@ -40,3 +44,4 @@ watchEffect(() => {
     @apply text-blue-800;
 }
 </style>
+../../../hyle-js/src/erc20../../../hyle-js/src/transactions

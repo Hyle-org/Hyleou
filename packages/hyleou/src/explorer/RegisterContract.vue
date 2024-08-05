@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { checkContractExists, checkTxStatus, registerContract, setupCosmos } from '@/cosmos';
+import { checkContractExists, checkTxStatus, registerContract, setupCosmos } from 'hyle-js';
 import Header from '@/explorer/Header.vue'
 import { ref } from 'vue';
-import { getNetworkRpcUrl, network } from './network';
+import { getNetworkRpcUrl, network } from 'hyle-js';
 
 const isCosmosReady = setupCosmos(`${getNetworkRpcUrl(network.value)}`);
 
@@ -111,3 +111,4 @@ const submitForm = async () => {
         </div>
     </div>
 </template>
+../../../hyle-js/src/network

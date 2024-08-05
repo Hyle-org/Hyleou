@@ -1,0 +1,43 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "outDir": "./dist",
+
+        /* Bundler mode */
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "preserve",
+
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+
+        "paths": {
+            "@/*": ["./src/*"]
+        }
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.vue",
+        "../hyle-js/src/blocks.ts",
+        "../hyle-js/src/erc20.test.ts",
+        "../hyle-js/src/erc20.ts",
+        "../hyle-js/src/network.ts",
+        "../hyle-js/src/transactions.ts",
+        "../hyle-js/src/cosmos.ts",
+        "../hyle-js/src/utils.ts",
+        "../hyle-js/src/indexer.ts"
+    ],
+    "references": [{ "path": "./tsconfig.node.json" }]
+}

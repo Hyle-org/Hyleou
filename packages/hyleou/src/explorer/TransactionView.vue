@@ -2,9 +2,9 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { MsgPublishPayloads, MsgRegisterContract } from '@/proto/tx';
+import { MsgPublishPayloads, MsgRegisterContract } from 'hyle-js';
 import Toggle from './Toggle.vue'
-import { getParsedTx, loadTransactionData, transactionData } from './transactions';
+import { getParsedTx, loadTransactionData, transactionData } from 'hyle-js';
 
 const route = useRoute();
 
@@ -51,3 +51,4 @@ const parsedTx = computed(() => getParsedTx(txData.value));
         </div>
     </div>
 </template>
+../../../hyle-js/src/transactions../../../hyle-js/src/proto/tx

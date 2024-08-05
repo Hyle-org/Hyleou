@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Header from '@/explorer/Header.vue'
 import { computed } from 'vue';
-import { blocks } from './blocks';
-import { transactionData } from './transactions';
-import { contractData } from './contracts';
+import { blocks } from 'hyle-js';
+import { transactionData } from 'hyle-js';
+import { contractData } from 'hyle-js';
 
 const contracts = computed(() => Object.keys(contractData));
 const transactions = computed(() => Object.values(transactionData));
@@ -58,3 +58,4 @@ const transactions = computed(() => Object.values(transactionData));
 </template>
 
 <style scoped></style>
+../../../hyle-js/src/blocks../../../hyle-js/src/transactions

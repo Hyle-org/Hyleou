@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { blockData, loadBlockData } from './blocks';
+import { blockData, loadBlockData } from 'hyle-js';
 
 const route = useRoute();
 
@@ -33,3 +33,4 @@ const data = computed(() => blockData[blockIdentifier.value]);
         </div>
     </div>
 </template>
+../../../hyle-js/src/blocks
