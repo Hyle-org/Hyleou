@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { getNetworkApiUrl, getNetworkRpcUrl, network } from './network';
+import { getNetworkRpcUrl, network } from './network';
 import { checkTxStatus, sendExecuteTX, setupCosmos } from '@/cosmos';
+import { contractData, loadContractData } from './contracts';
+import { transactionData } from './transactions';
 
 const route = useRoute();
 
@@ -11,28 +13,15 @@ const isCosmosReady = setupCosmos(`${getNetworkRpcUrl(network.value)}`);
 
 const contract_name = computed(() => route.params.contract_name as string);
 
-type ContractInfo = {
-    verifier: string;
-    program_id: string;
-    state_digest: string;
-}
-const contractData = reactive({} as Record<string, ContractInfo>);
+loadContractData(contract_name.value);
 
-const transactions = ref([]);
+const transactions = computed(() => Object.values(transactionData).filter(tx => tx.contracts?.includes(contract_name.value)));
 
 function parseBase64(base64: string): string {
     if (!base64) return '';
     const bytes = atob(base64);
     return [...bytes].map(byte => byte.charCodeAt(0).toString(16).padStart(2, '0')).join('');
 }
-
-onMounted(async () => {
-    const response = await fetch(`${getNetworkApiUrl(network.value)}/hyle/zktx/v1/contract/${contract_name.value}`);
-    contractData[contract_name.value] = (await response.json()).contract;
-
-    const txResp = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="hyle.zktx.v1.EventStateChange.contract_name='\\"${contract_name.value}\\"'"&page=1&per_page=10&order_by="desc"&match_events=true`);
-    transactions.value = (await txResp.json()).result.txs;
-});
 
 const executeError = ref<string | null>(null);
 const executeValue = ref<any | null>(null);
@@ -47,7 +36,6 @@ const executeSC = async () => {
         await isCosmosReady;
         const file = (document.getElementById('proof') as HTMLInputElement).files?.[0];
         const fileText = await file!.text();
-        console.log(btoa(fileText));
         const tx = await sendExecuteTX([{ contractName: contract_name.value, proof: btoa(fileText) }]);
         await new Promise((resolve) => setTimeout(resolve, 1000));
         executeValue.value = await checkTxStatus(tx.transactionHash);

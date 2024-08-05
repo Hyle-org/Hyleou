@@ -10,7 +10,7 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 // common types but don't rely on those being available. You need to set up your own code generator
 // for the types you care about. How this is done should be documented, but is not yet:
 // https://github.com/cosmos/cosmjs/issues/640
-import { MsgExecuteStateChanges, MsgRegisterContract } from "./proto/tx.ts";
+import { MsgPublishPayloadProof, MsgRegisterContract } from "./proto/tx.ts";
 import { getNetworkApiUrl, network } from "./explorer/network.ts";
 
 const mnemonic =
@@ -39,8 +39,8 @@ export async function setupCosmos(address: string) {
         {
             registry: new Registry([
                 [
-                    "/hyle.zktx.v1.MsgExecuteStateChanges",
-                    MsgExecuteStateChanges,
+                    "/hyle.zktx.v1.MsgPublishPayloadProof",
+                    MsgPublishPayloadProof,
                 ],
                 ["/hyle.zktx.v1.MsgRegisterContract", MsgRegisterContract],
             ]),
@@ -52,9 +52,9 @@ export async function sendExecuteTX(
     changes: { contractName: string; proof: string }[],
 ) {
     const msgAny = {
-        typeUrl: "/hyle.zktx.v1.MsgExecuteStateChanges",
+        typeUrl: "/hyle.zktx.v1.MsgPublishPayloadProof",
         value: {
-            stateChanges: changes,
+            payloads: changes,
         },
     };
     const fee = {

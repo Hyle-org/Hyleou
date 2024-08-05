@@ -173,7 +173,7 @@ export function base64ToUint8Array(base64: string): Uint8Array {
 }
 
 import { ref } from "vue";
-import { MsgExecuteStateChanges, MsgRegisterContract } from "./proto/tx.ts";
+import { MsgPublishPayloadProof, MsgRegisterContract } from "./proto/tx.ts";
 import { Tx as CosmosTx } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { getNetworkWebsocketUrl, network } from "./explorer/network.ts";
 
@@ -186,12 +186,12 @@ export async function GetAllStateChanges() {
         [] as {
             height: number;
             txhash: string;
-            messages: MsgExecuteStateChanges;
+            messages: MsgPublishPayloadProof;
         }[],
     );
 
     client.searchAndSubscribe(
-        "message.action='/hyle.zktx.v1.MsgExecuteStateChanges'",
+        "message.action='/hyle.zktx.v1.MsgPublishPayloadProof'",
         (client) => {
             messages.value = [];
             const results = client.getResults();
@@ -202,7 +202,7 @@ export async function GetAllStateChanges() {
                     messages.value.push({
                         height: tx.height,
                         txhash: tx.txhash,
-                        messages: MsgExecuteStateChanges.decode(msg.value),
+                        messages: MsgPublishPayloadProof.decode(msg.value),
                     });
                 });
             });

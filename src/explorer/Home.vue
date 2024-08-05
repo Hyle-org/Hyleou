@@ -1,27 +1,12 @@
 <script setup lang="ts">
 import Header from '@/explorer/Header.vue'
-import { ref, watchEffect } from 'vue';
-import { getNetworkApiUrl, getNetworkRpcUrl, network } from './network';
+import { computed } from 'vue';
+import { blocks } from './blocks';
+import { transactionData } from './transactions';
+import { contractData } from './contracts';
 
-
-const contracts = ref([]);
-const blocks = ref([]);
-const transactions = ref([]);
-
-watchEffect(async () => {
-    {
-        const response = await fetch(`${getNetworkApiUrl(network.value)}/hyle/zktx/v1/contracts`);
-        contracts.value = (await response.json()).contracts;
-    }
-    {
-        const response = await fetch(`${getNetworkRpcUrl(network.value)}/blockchain?no_cache=${Date.now()}`);
-        blocks.value = (await response.json()).result.block_metas;
-    }
-    {
-        const response = await fetch(`${getNetworkRpcUrl(network.value)}/tx_search?query="tx.height>=0"&page=1&per_page=10&order_by="desc"`);
-        transactions.value = (await response.json()).result.txs;
-    }
-});
+const contracts = computed(() => Object.keys(contractData));
+const transactions = computed(() => Object.values(transactionData));
 
 </script>
 
@@ -43,7 +28,7 @@ watchEffect(async () => {
             <div class="grid grid-cols-2">
                 <div>
                     <h2>Latest blocks</h2>
-                    <div>
+                    <div class="flex flex-col-reverse">
                         <p v-for="block in blocks" :key="block.header.height">
                             <RouterLink :to="{ name: 'block', params: { block_id: block.header.height } }"
                                 class="border-none">
@@ -51,7 +36,7 @@ watchEffect(async () => {
                             block.num_txs }} txs)
                             </RouterLink>
                         </p>
-                        <p>...</p>
+                        <p style="order: -1">...</p>
                     </div>
                 </div>
                 <div>
