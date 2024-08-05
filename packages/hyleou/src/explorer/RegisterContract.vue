@@ -2,7 +2,8 @@
 import { checkContractExists, checkTxStatus, registerContract, setupCosmos } from 'hyle-js';
 import Header from '@/explorer/Header.vue'
 import { ref } from 'vue';
-import { getNetworkRpcUrl, network } from 'hyle-js';
+import { getNetworkRpcUrl } from 'hyle-js';
+import { network } from '@/explorer/data';
 
 const isCosmosReady = setupCosmos(`${getNetworkRpcUrl(network.value)}`);
 
@@ -34,7 +35,7 @@ const submitForm = async () => {
     registerValue.value = null;
     registerError.value = null;
     await isCosmosReady;
-    if (await checkContractExists(name.value)) {
+    if (await checkContractExists(network.value, name.value)) {
         registerError.value = 'Contract already exists';
         registering.value = false;
         return;

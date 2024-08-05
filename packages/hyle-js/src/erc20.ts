@@ -19,7 +19,7 @@ export function deserByteArray(data: string[]) {
     for (let i = 1; i <= words; i++) {
         result += decimalToAscii(data[i]);
     }
-    if (remaining > 0) result += decimalToAscii(data.slice(-2, -1));
+    if (remaining > 0) result += decimalToAscii(data.slice(-2, -1)[0]);
     return result;
 }
 

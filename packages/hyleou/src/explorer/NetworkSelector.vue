@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { network } from 'hyle-js';
+import { network } from '@/explorer/data';
 </script>
 
 <template>

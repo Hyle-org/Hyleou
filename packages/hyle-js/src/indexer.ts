@@ -1,3 +1,5 @@
+import { getNetworkWebsocketUrl } from "./network";
+
 export class WebSocketConnection {
     protected ws!: WebSocket;
     private url: string;
@@ -68,15 +70,7 @@ export class WebSocketConnection {
     }
 }
 
-export type Tx = {
-    height: number;
-    txhash: string;
-    tx: any;
-};
-
 class JSONRpcClient extends WebSocketConnection {
-    private queuedResults: Tx[] = [];
-
     private MAX_PAGE_SIZE = 40;
 
     static async connect(url: string) {
@@ -85,22 +79,17 @@ class JSONRpcClient extends WebSocketConnection {
         return client;
     }
 
-    // Custom handler for transaction updates
-    private onNewTx: (client: JSONRpcClient) => void = () => {};
-
-    private async search(query: string, handler: (result: any) => void) {
+    private async search(endpoint: string, query: string, handler: (result: any) => void) {
         const total_count = await new Promise<number>((resolve) => {
-            this.call("tx_search", { query, per_page: `${this.MAX_PAGE_SIZE}`, order_by: "desc" }, (result) => {
+            this.call(endpoint, { query, per_page: `${this.MAX_PAGE_SIZE}`, order_by: "desc" }, (result) => {
                 handler(result);
-                this.onNewTx(this);
                 resolve(+result.total_count);
             });
         });
         // Search results are paginated, so we need to fetch all pages
         for (let i = 1; i * this.MAX_PAGE_SIZE < total_count; i++) {
-            // await new Promise((resolve) => setTimeout(resolve, 1000));
             this.call(
-                "tx_search",
+                endpoint,
                 {
                     query,
                     page: `${i + 1}`,
@@ -109,113 +98,32 @@ class JSONRpcClient extends WebSocketConnection {
                 },
                 async (result) => {
                     handler(result);
-                    // This is pessimistic but whatever.
-                    this.onNewTx(this);
                 },
             );
         }
     }
 
-    private subscribe(query: string) {
+    private subscribe(query: string, handler: (result: any) => void) {
         return this.call("subscribe", { query }, (result) => {
             if (!result.data?.value?.TxResult) {
-                this.onNewTx(this);
                 return;
             }
-            const tx = result.data.value.TxResult;
-            this.queuedResults.push({
-                height: tx.height,
-                txhash: result.events["tx.hash"][0],
-                tx: tx.tx,
-            });
-            this.onNewTx(this);
+            handler(result.data.value.TxResult);
         });
     }
 
-    async searchAndSubscribe(query: string, onNewTx: (client: JSONRpcClient) => void) {
-        this.onNewTx = onNewTx;
-        this.subscribe(query);
-        // TODO: It's possible that we actually miss some TX between subscribe and search
+    async searchAndSubscribe(endpoint: string, query: string, onNewResult: (client: JSONRpcClient) => void) {
+        this.subscribe(query, onNewResult);
+        // TODO: It's possible that we actually miss some data between subscribe and search
         // but that's fine for now.
-        this.search(query, (result) => {
-            this.queuedResults.push(
-                ...result.txs.map((tx: any) => ({
-                    height: tx.height,
-                    txhash: tx.hash,
-                    tx: tx.tx,
-                })),
-            );
+        this.search(endpoint, query, (result) => {
+            result.txs.forEach((tx: any) => onNewResult(tx));
         });
-    }
-
-    getResults() {
-        return this.queuedResults.sort((a, b) => a.height - b.height);
     }
 }
 
-import { ref } from "vue";
-import { MsgPublishPayloadProof, MsgRegisterContract } from "./proto/tx.ts";
-import { Tx as CosmosTx } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { getNetworkWebsocketUrl, network } from "./network.ts";
-import { base64ToUint8Array } from "@/utils.ts";
-
-export async function GetAllStateChanges() {
-    const client = await JSONRpcClient.connect(`${getNetworkWebsocketUrl(network.value)}/websocket`);
-
-    let messages = ref(
-        [] as {
-            height: number;
-            txhash: string;
-            messages: MsgPublishPayloadProof;
-        }[],
-    );
-
-    client.searchAndSubscribe("message.action='/hyle.zktx.v1.MsgPublishPayloadProof'", (client) => {
-        messages.value = [];
-        const results = client.getResults();
-        results.map((tx) => {
-            const txRaw = base64ToUint8Array(tx.tx);
-            const txData = CosmosTx.decode(txRaw);
-            txData.body?.messages?.map((msg) => {
-                messages.value.push({
-                    height: tx.height,
-                    txhash: tx.txhash,
-                    messages: MsgPublishPayloadProof.decode(msg.value),
-                });
-            });
-        });
-    });
-
-    return messages;
-}
-
-export function GetAllContractRegistrations() {
-    let registerMsgs = ref(
-        [] as {
-            height: number;
-            txhash: string;
-            messages: MsgRegisterContract;
-        }[],
-    );
-
-    (async () => {
-        const client = await JSONRpcClient.connect(`${getNetworkWebsocketUrl(network.value)}/websocket`);
-        client.searchAndSubscribe("message.action='/hyle.zktx.v1.MsgRegisterContract'", (client) => {
-            registerMsgs.value = [];
-            const results = client.getResults();
-            results.map((tx) => {
-                const txRaw = base64ToUint8Array(tx.tx);
-                const txData = CosmosTx.decode(txRaw);
-                txData.body?.messages?.map((msg) => {
-                    registerMsgs.value.push({
-                        height: tx.height,
-                        txhash: tx.txhash,
-                        messages: MsgRegisterContract.decode(msg.value),
-                    });
-                });
-            });
-        });
-    })();
-
-    return registerMsgs;
+export async function subscribeToTxSearch(network: string, query: string, handler: (result: any) => void) {
+    const client = await JSONRpcClient.connect(`${getNetworkWebsocketUrl(network)}/websocket`);
+    client.searchAndSubscribe("tx_search", query, handler);
+    // TODO return stop function
 }

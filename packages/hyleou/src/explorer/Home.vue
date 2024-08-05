@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import Header from '@/explorer/Header.vue'
 import { computed } from 'vue';
-import { blocks } from 'hyle-js';
-import { transactionData } from 'hyle-js';
-import { contractData } from 'hyle-js';
 
-const contracts = computed(() => Object.keys(contractData));
-const transactions = computed(() => Object.values(transactionData));
+import { blockStore, contractsStore, transactionsStore } from '@/explorer/data';
+
+const contracts = computed(() => Object.keys(contractsStore.value.contractData));
+const transactions = computed(() => Object.values(transactionsStore.value.transactionData));
 
 </script>
 
@@ -29,7 +28,7 @@ const transactions = computed(() => Object.values(transactionData));
                 <div>
                     <h2>Latest blocks</h2>
                     <div class="flex flex-col-reverse">
-                        <p v-for="block in blocks" :key="block.header.height">
+                        <p v-for="block in blockStore.blocks" :key="block.header.height">
                             <RouterLink :to="{ name: 'block', params: { block_id: block.header.height } }"
                                 class="border-none">
                                 #{{ block.header.height }} ({{

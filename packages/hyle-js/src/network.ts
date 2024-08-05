@@ -1,4 +1,4 @@
-import { ref, watch } from "vue";
+import { ref, effect } from "@vue/reactivity";
 
 class LocalStorageService {
     static save(key: string, value: any): void {
@@ -23,18 +23,14 @@ export function persistentRef<T>(key: string, initialValue: T) {
     const storedValue = LocalStorageService.load<T>(key);
     const dataRef = ref<T>(storedValue ?? initialValue);
 
-    watch(
-        dataRef,
-        (newValue) => {
-            LocalStorageService.save(key, newValue);
-        },
-        { deep: true },
-    );
+    effect(() => {
+        LocalStorageService.save(key, dataRef.value);
+    });
 
     return dataRef;
 }
 
-export const network = persistentRef("network", "devnet");
+// export const network = persistentRef("network", "devnet");
 
 export const getNetworkApiUrl = (network: string) => {
     return {

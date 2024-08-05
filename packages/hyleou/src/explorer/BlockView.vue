@@ -2,16 +2,16 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { blockData, loadBlockData } from 'hyle-js';
+import { blockStore } from '@/explorer/data';
 
 const route = useRoute();
 
 // For now just block heights, not hashes.
 const blockIdentifier = computed(() => route.params.block_id as string);
 
-loadBlockData(blockIdentifier.value);
+blockStore.value.loadBlockData(blockIdentifier.value);
 
-const data = computed(() => blockData[blockIdentifier.value]);
+const data = computed(() => blockStore.value.blockData[blockIdentifier.value]);
 </script>
 
 <template>
@@ -33,4 +33,3 @@ const data = computed(() => blockData[blockIdentifier.value]);
         </div>
     </div>
 </template>
-../../../hyle-js/src/blocks

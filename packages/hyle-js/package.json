@@ -1,26 +1,27 @@
 {
-    "name": "hyle-js",
-    "private": true,
-    "version": "0.0.1",
-    "type": "module",
-    "main": "./src/lib.ts",
-    "exports": {
-        ".": {
-            "default": "./dist/lib.js",
-            "types": "./dist/src/lib.d.ts"
-        }
-    },
-    "files": [
-        "dist",
-        "src"
-    ],
-    "scripts": {
-        "build": "bun build src/lib.ts --target=browser --outdir=dist && tsc && tsc-alias"
-    },
-    "dependencies": {
-        "@vue/reactivity": "^3.4.35"
-    },
-    "devDependencies": {
-        "tsc-alias": "^1.8.10"
+  "name": "hyle-js",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/lib.ts",
+  "exports": {
+    ".": {
+      "default": "./dist/lib.js",
+      "types": "./dist/src/lib.d.ts"
     }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "bun build src/lib.ts --target=browser --outdir=dist && tsc && tsc-alias"
+  },
+  "dependencies": {
+    "cosmjs-types": "^0.9.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.6",
+    "tsc-alias": "^1.8.10"
+  }
 }
