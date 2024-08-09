@@ -112,4 +112,3 @@ const submitForm = async () => {
         </div>
     </div>
 </template>
-../../../hyle-js/src/network

@@ -26,18 +26,6 @@
             "@/*": ["./src/*"]
         }
     },
-    "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "src/**/*.vue",
-        "../hyle-js/src/blocks.ts",
-        "../hyle-js/src/erc20.test.ts",
-        "../hyle-js/src/erc20.ts",
-        "../hyle-js/src/network.ts",
-        "../hyle-js/src/transactions.ts",
-        "../hyle-js/src/cosmos.ts",
-        "../hyle-js/src/utils.ts",
-        "../hyle-js/src/indexer.ts"
-    ],
+    "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
     "references": [{ "path": "./tsconfig.node.json" }]
 }

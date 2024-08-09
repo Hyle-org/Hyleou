@@ -57,4 +57,3 @@ const transactions = computed(() => Object.values(transactionsStore.value.transa
 </template>
 
 <style scoped></style>
-../../../hyle-js/src/blocks../../../hyle-js/src/transactions

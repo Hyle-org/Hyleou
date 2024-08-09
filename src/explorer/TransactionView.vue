@@ -52,4 +52,3 @@ const parsedTx = computed(() => getParsedTx(txData.value));
         </div>
     </div>
 </template>
-../../../hyle-js/src/transactions../../../hyle-js/src/proto/tx
