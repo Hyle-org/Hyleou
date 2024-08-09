@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { MsgPublishPayloads, MsgRegisterContract } from 'hyle-js';
+import { MsgPublishPayloads, MsgRegisterContract, MsgPublishPayloadProof } from 'hyle-js';
 import Toggle from './Toggle.vue'
 import { getParsedTx } from 'hyle-js';
 import { transactionsStore } from '@/explorer/data';
@@ -15,9 +15,15 @@ transactionsStore.value.loadTransactionData(txHash.value);
 
 type regTx = MsgRegisterContract;
 type xTx = MsgPublishPayloads;
+type proofTx = MsgPublishPayloadProof;
 
 const txData = computed(() => transactionsStore.value.transactionData[txHash.value]);
 const parsedTx = computed(() => getParsedTx(txData.value));
+
+const targetTx = computed(() => {
+    if (!txData.value) return '';
+    return Array.from(getParsedTx<MsgPublishPayloadProof>(txData.value).txHash).map(x => x.toString(16).padStart(2, '0')).join('');
+})
 </script>
 
 <template>
@@ -44,6 +50,12 @@ const parsedTx = computed(() => getParsedTx(txData.value));
                 <p>Payload</p>
                 <p>{{ (parsedTx as xTx).payloads.map(x => x.contractName) }}</p>
                 <p>{{ (parsedTx as xTx).payloads.map(x => x.data) }}</p>
+            </div>
+            <div class="my-4" v-else-if="txData?.type === '/hyle.zktx.v1.MsgPublishPayloadProof'">
+                <p>Proof for {{ (parsedTx as proofTx).contractName }} @
+                    <RouterLink :to="{ name: 'transaction', params: { tx_hash: targetTx } }">#0x{{ targetTx }}
+                    </RouterLink>
+                </p>
             </div>
             <!--<p>Raw data: <code class="break-all font-mono text-sm">{{ txData?.rawData }}</code></p>-->
             <Toggle>
