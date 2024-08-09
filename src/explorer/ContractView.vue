@@ -1,28 +1,31 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { getNetworkRpcUrl, network } from './network';
-import { checkTxStatus, sendExecuteTX, setupCosmos } from '@/cosmos';
-import { contractData, loadContractData } from './contracts';
-import { transactionData } from './transactions';
 import Erc20Vue from './Erc20.vue';
+import { contractsStore, transactionsStore } from '@/explorer/data';
 
 const route = useRoute();
 
-const isCosmosReady = setupCosmos(`${getNetworkRpcUrl(network.value)}`);
-
 const contract_name = computed(() => route.params.contract_name as string);
 
-loadContractData(contract_name.value);
+contractsStore.value.loadContractData(contract_name.value);
+transactionsStore.value.loadContractTxs(contract_name.value);
 
-const transactions = computed(() => Object.values(transactionData).filter(tx => tx.contracts?.includes(contract_name.value)));
+const transactions = computed(() => Object.values(transactionsStore.value.transactionData).filter(tx => tx.contracts?.includes(contract_name.value)));
+
+const contractData = computed(() => contractsStore.value.contractData?.[contract_name.value]);
 
 function parseBase64(base64: string): string {
     if (!base64) return '';
     const bytes = atob(base64);
     return [...bytes].map(byte => byte.charCodeAt(0).toString(16).padStart(2, '0')).join('');
 }
+/*
+import { getNetworkRpcUrl } from 'hyle-js';
+import { setupCosmos } from 'hyle-js';
+
+const isCosmosReady = setupCosmos(`${getNetworkRpcUrl(network.value)}`);
 
 const executeError = ref<string | null>(null);
 const executeValue = ref<any | null>(null);
@@ -45,19 +48,20 @@ const executeSC = async () => {
     }
     executing.value = false;
 }
+*/
 </script>
 
 <template>
     <div class="container m-auto">
         <Header></Header>
         <h1 class="my-4">{{ contract_name }} contract</h1>
-        <p>Powered by <span class="font-anton text-sm">{{ contractData?.[contract_name]?.verifier }}</span></p>
+        <p>Powered by <span class="font-anton text-sm">{{ contractData?.verifier }}</span></p>
         <p>Program ID: <code
-                class="align-text-bottom inline-block font-mono text-sm break-all max-h-[100px] overflow-scroll">{{ parseBase64(contractData?.[contract_name]?.program_id) }}</code>
+                class="align-text-bottom inline-block font-mono text-sm break-all max-h-[100px] overflow-scroll">{{ parseBase64(contractData?.program_id) }}</code>
         </p>
-        <p>State digest: <code class="font-mono text-sm">{{ parseBase64(contractData?.[contract_name]?.state_digest)
+        <p>State digest: <code class="font-mono text-sm">{{ parseBase64(contractData?.state_digest)
             }}</code></p>
-        <div v-if="contract_name === 'fake-erc20'" class="my-4">
+        <div v-if="contract_name === 'fake-erc20' || contract_name === 'smile_token'" class="my-4">
             <Erc20Vue :contract_name="contract_name"></Erc20Vue>
         </div>
         <div class="my-4">
@@ -71,6 +75,7 @@ const executeSC = async () => {
             </RouterLink>
             <p v-if="transactions.length === 0">No transactions found</p>
         </div>
+        <!--
         <div class="my-4">
             <h2>Execute a state change</h2>
             <p>
@@ -83,5 +88,6 @@ const executeSC = async () => {
             <pre class="text-sm font-mono">{{ executeError }}</pre>
             <p v-if="executeValue">Executed state change.</p>
         </div>
+        -->
     </div>
 </template>

@@ -2,20 +2,21 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { MsgPublishPayloads, MsgRegisterContract } from '@/proto/tx';
+import { MsgPublishPayloads, MsgRegisterContract } from 'hyle-js';
 import Toggle from './Toggle.vue'
-import { getParsedTx, loadTransactionData, transactionData } from './transactions';
+import { getParsedTx } from 'hyle-js';
+import { transactionsStore } from '@/explorer/data';
 
 const route = useRoute();
 
 const txHash = computed(() => route.params.tx_hash as string);
 
-loadTransactionData(txHash.value);
+transactionsStore.value.loadTransactionData(txHash.value);
 
 type regTx = MsgRegisterContract;
 type xTx = MsgPublishPayloads;
 
-const txData = computed(() => transactionData[txHash.value]);
+const txData = computed(() => transactionsStore.value.transactionData[txHash.value]);
 const parsedTx = computed(() => getParsedTx(txData.value));
 </script>
 

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, reactive, watchEffect } from 'vue';
-import { Erc20Parser } from './erc20';
-import { transactionData } from './transactions';
+import { Erc20Parser } from 'hyle-js';
+import { transactionsStore } from '@/explorer/data';
 const props = defineProps<{
     contract_name: string;
 }>();
 
 const transactions = computed(() => {
-    const txs = Object.values(transactionData).filter(tx => tx.contracts?.includes(props.contract_name))
+    const txs = Object.values(transactionsStore.value.transactionData).filter(tx => tx.contracts?.includes(props.contract_name))
     txs.sort((a, b) => a.height - b.height + a.index - b.index);
     return txs;
 });
@@ -17,6 +17,10 @@ const contractData = ref(new Erc20Parser(props.contract_name));
 watchEffect(() => {
     contractData.value = reactive(new Erc20Parser(props.contract_name));
     transactions.value.forEach(tx => {
+        if (!tx.type) {
+            transactionsStore.value.loadTransactionData(tx.hash); // inefficient if we do this many times.
+            return;
+        }
         contractData.value.consumeTx(tx);
         if (tx.status !== "sequenced") contractData.value.settleTx(tx.hash, tx.status === "success");
     });

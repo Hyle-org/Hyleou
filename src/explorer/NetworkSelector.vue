@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { network } from '@/explorer/network';
+import { network } from '@/explorer/data';
 </script>
 
 <template>
