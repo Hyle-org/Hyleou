@@ -7,6 +7,7 @@ import ContractView from "@/explorer/ContractView.vue";
 import BlockView from "@/explorer/BlockView.vue";
 import TransactionView from "@/explorer/TransactionView.vue";
 import RegisterContract from "@/explorer/RegisterContract.vue";
+import SendBlob from "./explorer/SendBlob.vue";
 
 const routes = [
     { path: "/", component: Home, name: "Home" },
@@ -25,6 +26,11 @@ const routes = [
         path: "/register_contract",
         component: RegisterContract,
         name: "register_contract",
+    },
+    {
+        path: "/send_blob",
+        component: SendBlob,
+        name: "send_blob",
     },
 ];
 

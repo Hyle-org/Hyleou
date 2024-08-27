@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import Header from './Header.vue';
-import { MsgPublishPayloads, MsgRegisterContract, MsgPublishPayloadProof } from 'hyle-js';
+import { MsgPublishPayloads, MsgRegisterContract, MsgPublishPayloadProof, broadcastProofTx, checkTxStatus } from 'hyle-js';
 import Toggle from './Toggle.vue'
 import { getParsedTx } from 'hyle-js';
-import { transactionsStore } from '@/explorer/data';
-
+import { network, transactionsStore } from '@/explorer/data';
+import PayloadProofWidget from './PayloadProofWidget.vue';
 const route = useRoute();
 
 const txHash = computed(() => route.params.tx_hash as string);
@@ -46,10 +46,16 @@ const targetTx = computed(() => {
                 (txData).stateDigest).map(x => x.toString(16).padStart(2, '0')).join('') }}
                 </p>
             </div>
-            <div class="my-4" v-else-if="txData?.type === '/hyle.zktx.v1.MsgPublishPayloads'">
-                <p>Payload</p>
-                <p>{{ (parsedTx as xTx).payloads.map(x => x.contractName) }}</p>
-                <p>{{ (parsedTx as xTx).payloads.map(x => x.data) }}</p>
+            <div class="my-4 border-b-2" v-else-if="txData?.type === '/hyle.zktx.v1.MsgPublishPayloads'">
+                <h2>Payloads</h2>
+                <div v-for="payload, i in (parsedTx as xTx).payloads   " class="border-t-2 mt-3">
+                    <h4 class="pl-8 py-3">{{ payload.contractName }}</h4>
+                    <Toggle>
+                        <code class="break-all w-full my-4 text-sm font-mono whitespace-pre">{{ payload.data }}</code>
+                    </Toggle>
+                    <PayloadProofWidget v-if="txData.status === 'sequenced'" :payloadIndex="i"
+                        :contractName="payload.contractName" :hash="txHash"></PayloadProofWidget>
+                </div>
             </div>
             <div class="my-4" v-else-if="txData?.type === '/hyle.zktx.v1.MsgPublishPayloadProof'">
                 <p>Proof for {{ (parsedTx as proofTx).contractName }} @
