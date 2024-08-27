@@ -15,8 +15,11 @@ import NetworkSelector from '@/explorer/NetworkSelector.vue'
                 <RouterLink class="md:inline-block hidden mr-4" :to="{ name: 'Home' }">
                     <button>Home</button>
                 </RouterLink>
-                <RouterLink class="inline-block" :to="{ name: 'register_contract' }">
+                <RouterLink class="inline-block  mr-4" :to="{ name: 'register_contract' }">
                     <button>new&nbsp;contract</button>
+                </RouterLink>
+                <RouterLink class="inline-block" :to="{ name: 'send_blob' }">
+                    <button>send&nbsp;blob</button>
                 </RouterLink>
             </div>
             <NetworkSelector />
