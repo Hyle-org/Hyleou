@@ -6,8 +6,7 @@ export default {
             colors: {
                 primary: "rgb(var(--color-primary) / <alpha-value>)",
                 secondary: "rgb(var(--color-secondary) / <alpha-value>)",
-                "secondary-darker":
-                    "rgb(var(--color-secondary-darker) / <alpha-value>)",
+                "secondary-darker": "rgb(var(--color-secondary-darker) / <alpha-value>)",
             },
             fontFamily: {
                 garamond: ['"EB Garamond"', "serif"],

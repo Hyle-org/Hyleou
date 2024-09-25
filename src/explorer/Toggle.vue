@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from "vue";
 
 // Implement a v-model for a toggle button
 const toggle = ref(false);
 const toggleHandler = () => {
     toggle.value = !toggle.value;
-    emit('update:modelValue', toggle.value);
-}
-const emit = defineEmits(['update:modelValue']);
-
+    emit("update:modelValue", toggle.value);
+};
+const emit = defineEmits(["update:modelValue"]);
 </script>
 
 <template>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import Header from '@/explorer/Header.vue'
-import { computed } from 'vue';
+import Header from "@/explorer/Header.vue";
+import { computed } from "vue";
 
-import { blockStore, contractsStore, transactionsStore } from '@/explorer/data';
+import { blockStore, contractsStore, transactionsStore } from "@/explorer/data";
 
 const contracts = computed(() => Object.keys(contractsStore.value.contractData));
 const transactions = computed(() => Object.values(transactionsStore.value.transactionData));
-
 </script>
 
 <template>
@@ -17,8 +16,11 @@ const transactions = computed(() => Object.values(transactionsStore.value.transa
             <div class="my-2">
                 <h2>Contracts</h2>
                 <div>
-                    <router-link :to="{ name: 'contract', params: { contract_name: contract } }"
-                        v-for="contract in contracts" :key="contract">
+                    <router-link
+                        :to="{ name: 'contract', params: { contract_name: contract } }"
+                        v-for="contract in contracts"
+                        :key="contract"
+                    >
                         <p>- {{ contract }}</p>
                     </router-link>
                     <p v-if="contracts.length === 0">No contracts found.</p>
@@ -29,10 +31,8 @@ const transactions = computed(() => Object.values(transactionsStore.value.transa
                     <h2>Latest blocks</h2>
                     <div class="flex flex-col-reverse">
                         <p v-for="block in blockStore.blocks" :key="block.header.height">
-                            <RouterLink :to="{ name: 'block', params: { block_id: block.header.height } }"
-                                class="border-none">
-                                #{{ block.header.height }} ({{
-                            block.num_txs }} txs)
+                            <RouterLink :to="{ name: 'block', params: { block_id: block.header.height } }" class="border-none">
+                                #{{ block.header.height }} ({{ block.num_txs }} txs)
                             </RouterLink>
                         </p>
                         <p style="order: -1">...</p>
@@ -41,11 +41,11 @@ const transactions = computed(() => Object.values(transactionsStore.value.transa
                 <div>
                     <h2>Latest transactions</h2>
                     <div>
-                        <RouterLink :to="{ name: 'transaction', params: { tx_hash: tx.hash } }"
-                            v-for="tx in transactions" :key="tx.hash">
-                            <p>0x<span class="tracking-tighter">{{ tx.hash.slice(0, 5) }}...{{ tx.hash.slice(-5)
-                                    }}</span>
-                                (block #{{ tx.height }})
+                        <RouterLink :to="{ name: 'transaction', params: { tx_hash: tx.hash } }" v-for="tx in transactions" :key="tx.hash">
+                            <p>
+                                0x<span class="tracking-tighter">{{ tx.hash.slice(0, 5) }}...{{ tx.hash.slice(-5) }}</span> (block #{{
+                                    tx.height
+                                }})
                             </p>
                         </RouterLink>
                         <p>...</p>
