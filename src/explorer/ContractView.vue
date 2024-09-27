@@ -16,12 +16,18 @@ const transactions = computed(() =>
     Object.values(transactionsStore.value.transactionData).filter((tx) => tx.contracts?.includes(contract_name.value)),
 );
 
-const contractData = computed(() => contractsStore.value.contractData?.[contract_name.value]);
+const contractData = computed(() => {
+    console.log("aze", contract_name.value);
+    console.log("store", JSON.stringify(contractsStore.value.contractData));
+    console.log("data", contractsStore.value.contractData[contract_name.value]);
+    return contractsStore.value.contractData?.[contract_name.value];
+});
 
 function parseBase64(base64: string): string {
-    if (!base64) return "";
-    const bytes = atob(base64);
-    return [...bytes].map((byte) => byte.charCodeAt(0).toString(16).padStart(2, "0")).join("");
+    return base64;
+    //if (!base64) return "";
+    //const bytes = atob(base64);
+    //return [...bytes].map((byte) => byte.charCodeAt(0).toString(16).padStart(2, "0")).join("");
 }
 </script>
 
@@ -46,11 +52,11 @@ function parseBase64(base64: string): string {
         </div>
         <div class="my-4">
             <h2>Transactions</h2>
-            <RouterLink :to="{ name: 'transaction', params: { tx_hash: tx.hash } }" v-for="tx in transactions" :key="tx.hash">
+            <RouterLink :to="{ name: 'transaction', params: { tx_hash: tx.tx_hash } }" v-for="tx in transactions" :key="tx.tx_hash">
                 <p>
                     - Tx
-                    <span class="tracking-tighter">{{ tx.hash.slice(0, 5) }}...{{ tx.hash.slice(-5) }}</span>
-                    (block #{{ tx.height }})
+                    <span class="tracking-tighter">{{ tx.tx_hash.slice(0, 5) }}...{{ tx.tx_hash.slice(-5) }}</span>
+                    (block #{{ tx.block_height }})
                 </p>
             </RouterLink>
             <p v-if="transactions.length === 0">No transactions found</p>
