@@ -3,36 +3,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import "@/style.css";
 import App from "@/App.vue";
 import Home from "@/explorer/Home.vue";
-import ContractView from "@/explorer/ContractView.vue";
-import BlockView from "@/explorer/BlockView.vue";
-import TransactionView from "@/explorer/TransactionView.vue";
-import RegisterContract from "@/explorer/RegisterContract.vue";
-import SendBlob from "./explorer/SendBlob.vue";
 
-const routes = [
-    { path: "/", component: Home, name: "Home" },
-    {
-        path: "/contract/:contract_name",
-        component: ContractView,
-        name: "contract",
-    },
-    { path: "/block/:block_id", component: BlockView, name: "block" },
-    {
-        path: "/transaction/:tx_hash",
-        component: TransactionView,
-        name: "transaction",
-    },
-    {
-        path: "/register_contract",
-        component: RegisterContract,
-        name: "register_contract",
-    },
-    {
-        path: "/send_blob",
-        component: SendBlob,
-        name: "send_blob",
-    },
-];
+const routes = [{ path: "/", component: Home, name: "Home" }];
 
 const router = createRouter({
     history: createWebHistory(),

@@ -19,6 +19,10 @@ h6 {
     @apply font-anton uppercase;
 }
 
+h1 {
+    @apply text-4xl;
+}
+
 h2 {
     @apply text-xl;
 }
@@ -29,10 +33,6 @@ p {
 
 body {
     @apply bg-primary text-white font-garamond;
-}
-
-h1 {
-    @apply text-4xl;
 }
 
 button {

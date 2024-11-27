@@ -1,5 +1,4 @@
-import { BlockStore, ContractsStore, TransactionsStore } from "hyle-js";
-import { reactive, ref, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 
 class LocalStorageService {
     static save(key: string, value: any): void {
@@ -31,18 +30,11 @@ export const persistentRef = <T>(key: string, initialValue: T) => {
     return dataRef;
 };
 
-export const network = persistentRef("network", "localhost");
+export const network = persistentRef("network", "devnet");
 
-export const blockStore = ref(reactive(new BlockStore(network.value)));
-export const contractsStore = ref(reactive(new ContractsStore(network.value)));
-export const transactionsStore = ref(reactive(new TransactionsStore(network.value)));
-
-watchEffect(() => {
-    blockStore.value = reactive(new BlockStore(network.value));
-    contractsStore.value = reactive(new ContractsStore(network.value));
-    transactionsStore.value = reactive(new TransactionsStore(network.value));
-
-    blockStore.value.loadBlocks();
-    transactionsStore.value.loadTxData();
-    contractsStore.value.loadContract();
-});
+export const getNetworkApiUrl = (network: string) => {
+    return {
+        localhost: "http://localhost:1317",
+        devnet: "https://rest-api.devnet.hyle.eu",
+    }[network];
+};

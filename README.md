@@ -6,7 +6,7 @@ WIP, minimalistic explorer for the Hylé chain.
 
 ```bash
 bun install
-bun run dev
+bun dev
 ```
 
 ### Setup
