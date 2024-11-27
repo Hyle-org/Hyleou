@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Header from '@/explorer/Header.vue'
-import { blockStore } from '@/state/data';
-
+import Header from "@/explorer/Header.vue";
+import { blockStore } from "@/state/data";
 </script>
 
 <template>
@@ -11,7 +10,7 @@ import { blockStore } from '@/state/data';
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white p-4 text-gray-700 rounded-xl">
                     <h2>Latest blocks</h2>
-                    <hr>
+                    <hr />
                     <div class="flex flex-col-reverse">
                         <div v-for="block in blockStore.blocks">
                             <h4>Block {{ block.height }}</h4>
@@ -21,9 +20,8 @@ import { blockStore } from '@/state/data';
                 </div>
                 <div class="bg-white p-4 text-gray-700 rounded-xl">
                     <h2>Latest transactions</h2>
-                    <hr>
-                    <div>
-                    </div>
+                    <hr />
+                    <div></div>
                 </div>
             </div>
         </div>
