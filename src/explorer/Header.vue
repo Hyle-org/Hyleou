@@ -5,7 +5,7 @@ import NetworkSelector from "@/explorer/NetworkSelector.vue";
 
 <template>
     <div class="border-b border-secondary flex items-center mb-4">
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 mr-4">
             <RouterLink :to="{ name: 'Home' }">
                 <h3 class="my-1"><img :src="Logo" alt="Hylé logo" class="h-16" /></h3>
             </RouterLink>

@@ -9,20 +9,28 @@ export type TransactionInfo = {
 
 export class TransactionStore {
     network: string;
-    transaction: Record<string, TransactionInfo> = {};
-    latest_transactions: string[] = [];
+    data: Record<string, TransactionInfo> = {};
+    latest: string[] = [];
 
     constructor(network: string) {
         this.network = network;
     }
 
-    async loadLatestTransactions() {
+    async loadLatest() {
         const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/transactions?no_cache=${Date.now()}`);
         let resp = await response.json();
-        this.latest_transactions = resp.map((tx: TransactionInfo) => tx.tx_hash);
-        for (let tx of resp) {
-            this.transaction[tx.tx_hash] = tx;
+        this.latest = resp.map((tx: TransactionInfo) => tx.tx_hash);
+        for (let item of resp) {
+            this.data[item.tx_hash] = item;
         }
-        console.log(this);
+    }
+
+    async load(tx_hash: string) {
+        if (this.data[tx_hash]) {
+            return;
+        }
+        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/transaction/hash/${tx_hash}`);
+        let item = await response.json();
+        this.data[item.tx_hash] = item;
     }
 }

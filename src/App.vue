@@ -6,7 +6,7 @@
 
 <style>
 html {
-    @apply font-garamond font-normal leading-snug;
+    @apply font-text font-normal leading-snug;
 }
 
 h1,
@@ -26,12 +26,8 @@ h2 {
     @apply text-xl;
 }
 
-p {
-    @apply font-garamond text-xl leading-6;
-}
-
 body {
-    @apply bg-primary text-white font-garamond;
+    @apply bg-primary;
 }
 
 button {
