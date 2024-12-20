@@ -21,7 +21,9 @@ const data = computed(() => transactionStore.value.data?.[tx_hash.value]);
         <Header></Header>
         <div class="px-8 py-4 bg-white rounded-xl text-gray-700">
             <h2 class="mb-4">Tx 0x{{ tx_hash }}</h2>
-            <p>Block: {{ data?.block_hash }}</p>
+            <p>
+                Block: <router-link :to="{ name: 'Block', params: { block_hash: data?.block_hash } }">{{ data?.block_hash }}</router-link>
+            </p>
             <p>Type: {{ data?.transaction_type }}</p>
             <p>Status: {{ data?.transaction_status }}</p>
             <div class="mt-4">
