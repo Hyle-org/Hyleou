@@ -32,14 +32,8 @@ const data = computed(() => blockStore.value.data?.[block_hash.value]);
             <div class="mt-4">
                 <h3 class="m-0">Transactions:</h3>
                 <div class="flex flex-col">
-                    <p>
-                        <router-link
-                            v-for="tx_hash in blockStore.tx_hashes_by_block?.[block_hash] || []"
-                            :key="tx_hash"
-                            :to="{ name: 'Transaction', params: { tx_hash } }"
-                        >
-                            - {{ tx_hash }}
-                        </router-link>
+                    <p v-for="tx_hash in blockStore.tx_hashes_by_block?.[block_hash] || []" :key="tx_hash">
+                        <router-link :to="{ name: 'Transaction', params: { tx_hash } }"> - {{ tx_hash }} </router-link>
                     </p>
                 </div>
                 <pre class="mt-2 bg-gray-100 p-4 rounded-xl text-xs font-mono">{{
