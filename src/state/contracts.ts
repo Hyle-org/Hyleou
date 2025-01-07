@@ -24,7 +24,7 @@ export class ContractStore {
         if (this.data[contract_name]) {
             return;
         }
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/contract/${contract_name}`);
+        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/contract/${contract_name}?no_cache=${Date.now()}`);
         let item = await response.json();
         this.data[item.contract_name] = item;
     }

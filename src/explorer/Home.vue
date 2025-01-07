@@ -7,7 +7,7 @@ import { onMounted, ref } from "vue";
 const consensusInfo = ref(null);
 
 const fetchConsensusInfo = async () => {
-    const response = await fetch(getNetworkApiUrl(network.value) + "/v1/consensus/info");
+    const response = await fetch(getNetworkApiUrl(network.value) + `/v1/consensus/info?no_cache=${Date.now()}`);
     consensusInfo.value = await response.json();
 };
 

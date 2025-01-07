@@ -32,7 +32,7 @@ export class BlockStore {
         if (this.data[hash]) {
             return;
         }
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/block/hash/${hash}`);
+        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/block/hash/${hash}?no_cache=${Date.now()}`);
         let item = await response.json();
         this.data[item.hash] = item;
     }
@@ -46,7 +46,9 @@ export class BlockStore {
             await this.load(hash);
         }
         // TODO: change this once I've deployed the fix
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/transactions/block/${this.data[hash].height}`);
+        const response = await fetch(
+            `${getNetworkApiUrl(this.network)}/v1/indexer/transactions/block/${this.data[hash].height}?no_cache=${Date.now()}`,
+        );
         let resp = await response.json();
         this.tx_hashes_by_block[hash] = resp.map((tx: any) => tx.tx_hash);
     }

@@ -29,7 +29,7 @@ export class TransactionStore {
         if (this.data[tx_hash]) {
             return;
         }
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/transaction/hash/${tx_hash}`);
+        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/transaction/hash/${tx_hash}?no_cache=${Date.now()}`);
         let item = await response.json();
         this.data[item.tx_hash] = item;
     }
