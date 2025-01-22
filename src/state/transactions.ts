@@ -3,7 +3,7 @@ import { getNetworkApiUrl } from "@/state/network";
 export type TransactionInfo = {
     tx_hash: string;
     block_hash: string;
-    transaction_type: string | "RegisterContractTransaction";
+    transaction_type: string;
     transaction_status: string | "Success";
 };
 
