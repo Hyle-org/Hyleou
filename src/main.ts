@@ -6,6 +6,8 @@ import Home from "@/explorer/Home.vue";
 import Transaction from "./explorer/Transaction.vue";
 import Block from "./explorer/Block.vue";
 import Contract from "./explorer/Contract.vue";
+import Blocks from "./explorer/Blocks.vue";
+import Transactions from "./explorer/Transactions.vue";
 
 const routes = [
     { path: "/", component: Home, name: "Home" },
@@ -18,6 +20,16 @@ const routes = [
         path: "/block/:block_hash",
         component: Block,
         name: "Block",
+    },
+    {
+        path: "/blocks",
+        component: Blocks,
+        name: "Blocks",
+    },
+    {
+        path: "/transactions",
+        component: Transactions,
+        name: "Transactions",
     },
     {
         path: "/contract/:contract_name",
