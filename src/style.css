@@ -4,8 +4,40 @@
 
 @layer base {
     :root {
+        --background: #F8F9FA;
+        --foreground: #1E2933;
         --color-primary: 224 72 46;
         --color-secondary: 245 245 245;
         --color-secondary-darker: 225 225 225;
+    }
+}
+
+@layer components {
+    .card {
+        @apply bg-white rounded-2xl shadow-card p-6 transition-all duration-200 hover:shadow-lg;
+    }
+    
+    .section-title {
+        @apply text-2xl font-display font-bold text-secondary mb-4;
+    }
+    
+    .link-item {
+        @apply p-4 rounded-xl transition-all duration-200 hover:bg-neutral/5;
+    }
+    
+    .hash-text {
+        @apply font-mono text-xs text-neutral hover:text-primary transition-colors;
+    }
+    
+    .stat-card {
+        @apply bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-white/20 shadow-sm;
+    }
+    
+    .data-grid {
+        @apply grid gap-4 md:grid-cols-2 lg:grid-cols-3;
+    }
+    
+    .list-item {
+        @apply flex items-center space-x-3 p-3 rounded-lg hover:bg-secondary/5 transition-colors;
     }
 }
