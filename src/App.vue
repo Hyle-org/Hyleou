@@ -15,7 +15,7 @@ h3,
 h4,
 h5,
 h6 {
-    @apply font-anton uppercase;
+    @apply font-display uppercase;
 }
 
 h1 {
@@ -27,27 +27,27 @@ h2 {
 }
 
 body {
-    @apply bg-primary;
+    @apply bg-background text-foreground;
 }
 
 button {
-    @apply bg-gray-900 font-anton uppercase rounded-lg px-4 py-2 text-white;
+    @apply font-display uppercase rounded-xl transition-all duration-200;
 }
 
-button:hover:not(:disabled) {
-    @apply tracking-widest;
+button:not([class*="bg-"]) {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20 text-secondary hover:bg-secondary/5;
 }
 
 button:active:not(:disabled) {
-    @apply bg-secondary text-primary;
+    @apply bg-primary/10 text-primary border-primary/20;
 }
 
 button:disabled {
-    @apply bg-gray-500 text-opacity-50;
+    @apply opacity-50 cursor-not-allowed;
 }
 
 p a {
-    @apply border-b-2 border-secondary;
+    @apply border-b-2 border-primary;
 }
 
 i.spinner {
@@ -58,14 +58,14 @@ i.spinner {
 input,
 select,
 textarea {
-    @apply text-primary font-mono p-2 rounded-lg leading-snug;
+    @apply text-foreground font-text p-2 rounded-lg leading-snug;
 }
 
 input[type="file"] {
-    @apply text-secondary text-sm;
+    @apply text-neutral text-sm;
 }
 
 label {
-    @apply font-anton bg-opacity-50 bg-black px-2 rounded-t-lg;
+    @apply font-display bg-secondary/10 px-2 rounded-t-lg text-secondary;
 }
 </style>
