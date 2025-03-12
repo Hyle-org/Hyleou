@@ -32,10 +32,17 @@ export const persistentRef = <T>(key: string, initialValue: T) => {
 
 export const network = persistentRef("network", "devnet");
 
-export const getNetworkApiUrl = (network: string) => {
+export const getNetworkIndexerApiUrl = (network: string) => {
     return {
         localhost: "http://localhost:4321",
-        devnet: "https://rest-api.devnet.hyle.eu",
+        devnet: "https://indexer.devnet.hyle.eu",
         testnet: "https://indexer.testnet.hyle.eu",
+    }[network];
+};
+export const getNetworkNodeApiUrl = (network: string) => {
+    return {
+        localhost: "http://localhost:4321",
+        devnet: "https://node.devnet.hyle.eu",
+        testnet: "https://node.testnet.hyle.eu",
     }[network];
 };

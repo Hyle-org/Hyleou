@@ -1,4 +1,4 @@
-import { getNetworkApiUrl } from "@/state/network";
+import { getNetworkIndexerApiUrl } from "@/state/network";
 
 export type TransactionInfo = {
     tx_hash: string;
@@ -17,7 +17,7 @@ export class TransactionStore {
     }
 
     async loadLatest() {
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/transactions?no_cache=${Date.now()}`);
+        const response = await fetch(`${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transactions?no_cache=${Date.now()}`);
         let resp = await response.json();
         this.latest = resp.map((tx: TransactionInfo) => tx.tx_hash);
         for (let item of resp) {
@@ -29,7 +29,7 @@ export class TransactionStore {
         if (this.data[tx_hash]) {
             return;
         }
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/transaction/hash/${tx_hash}?no_cache=${Date.now()}`);
+        const response = await fetch(`${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transaction/hash/${tx_hash}?no_cache=${Date.now()}`);
         let item = await response.json();
         this.data[item.tx_hash] = item;
     }

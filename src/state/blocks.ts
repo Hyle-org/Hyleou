@@ -1,4 +1,4 @@
-import { getNetworkApiUrl } from "@/state/network";
+import { getNetworkIndexerApiUrl } from "@/state/network";
 
 export type BlockInfo = {
     hash: string;
@@ -20,7 +20,7 @@ export class BlockStore {
     }
 
     async loadLatest() {
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/blocks?no_cache=${Date.now()}`);
+        const response = await fetch(`${getNetworkIndexerApiUrl(this.network)}/v1/indexer/blocks?no_cache=${Date.now()}`);
         let resp = await response.json();
         this.latest = resp.map((block: BlockInfo) => block.hash);
         for (let item of resp) {
@@ -32,7 +32,7 @@ export class BlockStore {
         if (this.data[hash]) {
             return;
         }
-        const response = await fetch(`${getNetworkApiUrl(this.network)}/v1/indexer/block/hash/${hash}?no_cache=${Date.now()}`);
+        const response = await fetch(`${getNetworkIndexerApiUrl(this.network)}/v1/indexer/block/hash/${hash}?no_cache=${Date.now()}`);
         let item = await response.json();
         this.data[item.hash] = item;
     }
@@ -47,7 +47,7 @@ export class BlockStore {
         }
         // TODO: change this once I've deployed the fix
         const response = await fetch(
-            `${getNetworkApiUrl(this.network)}/v1/indexer/transactions/block/${this.data[hash].height}?no_cache=${Date.now()}`,
+            `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transactions/block/${this.data[hash].height}?no_cache=${Date.now()}`,
         );
         let resp = await response.json();
         this.tx_hashes_by_block[hash] = resp.map((tx: any) => tx.tx_hash);

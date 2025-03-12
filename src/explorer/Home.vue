@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import Header from "@/explorer/Header.vue";
 import { blockStore, contractStore, transactionStore } from "@/state/data";
-import { getNetworkApiUrl, network } from "@/state/network";
+import { getNetworkNodeApiUrl, network } from "@/state/network";
 import { onMounted, ref } from "vue";
 
 const consensusInfo = ref(null);
 
 const fetchConsensusInfo = async () => {
-    const response = await fetch(getNetworkApiUrl(network.value) + `/v1/consensus/info?no_cache=${Date.now()}`);
+    const response = await fetch(getNetworkNodeApiUrl(network.value) + `/v1/consensus/info?no_cache=${Date.now()}`);
     consensusInfo.value = await response.json();
 };
 
