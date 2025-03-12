@@ -36,5 +36,6 @@ export const getNetworkApiUrl = (network: string) => {
     return {
         localhost: "http://localhost:4321",
         devnet: "https://rest-api.devnet.hyle.eu",
+        testnet: "https://indexer.testnet.hyle.eu",
     }[network];
 };

@@ -6,6 +6,7 @@ import { network } from "@/state/network";
     <div class="h-full">
         <select v-model="network">
             <option value="devnet">Devnet</option>
+            <option value="testnet">Devnet2</option>
             <option value="localhost">Localhost</option>
         </select>
     </div>
