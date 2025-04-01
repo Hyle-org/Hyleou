@@ -2,6 +2,11 @@ import { getNetworkIndexerApiUrl } from "@/state/network";
 
 export type ContractInfo = {
     contract_name: string;
+    tx_hash: string;
+    verifier: string;
+    program_id: string;
+    state_digest: string;
+    total_transactions: number;
 };
 
 export class ContractStore {

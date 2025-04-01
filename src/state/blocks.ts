@@ -13,8 +13,6 @@ export class BlockStore {
     data: Record<string, BlockInfo> = {};
     latest: string[] = [];
 
-    tx_hashes_by_block: Record<string, string[]> = {};
-
     constructor(network: string) {
         this.network = network;
     }
@@ -37,19 +35,14 @@ export class BlockStore {
         this.data[item.hash] = item;
     }
 
-    async loadTxForBlock(hash: string) {
-        if (this.tx_hashes_by_block[hash]) {
-            return;
-        }
-
-        if (!this.data[hash]) {
-            await this.load(hash);
-        }
-        // TODO: change this once I've deployed the fix
+    async loadBlocks(startBlock: number, pageSize: number) {
         const response = await fetch(
-            `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transactions/block/${this.data[hash].height}?no_cache=${Date.now()}`,
+            `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/blocks?start_block=${startBlock}&nb_results=${pageSize}&no_cache=${Date.now()}`,
         );
-        let resp = await response.json();
-        this.tx_hashes_by_block[hash] = resp.map((tx: any) => tx.tx_hash);
+        const blocks = await response.json();
+        for (let block of blocks) {
+            this.data[block.hash] = block;
+        }
+        return blocks;
     }
 }
