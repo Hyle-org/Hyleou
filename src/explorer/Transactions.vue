@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Header from "@/explorer/Header.vue";
-
 </script>
 
 <template>
@@ -24,4 +23,4 @@ import Header from "@/explorer/Header.vue";
             </div>
         </main>
     </div>
-</template> 
+</template>

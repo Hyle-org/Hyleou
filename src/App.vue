@@ -46,8 +46,8 @@ button:disabled {
     @apply opacity-50 cursor-not-allowed;
 }
 
-p a {
-    @apply border-b-2 border-primary;
+a {
+    @apply text-primary hover:text-primary/80 font-medium;
 }
 
 i.spinner {
