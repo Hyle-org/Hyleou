@@ -8,7 +8,7 @@ import Block from "./explorer/Block.vue";
 import Contract from "./explorer/Contract.vue";
 import Blocks from "./explorer/Blocks.vue";
 import Transactions from "./explorer/Transactions.vue";
-
+import Proofs from "./explorer/Proofs.vue";
 const routes = [
     { path: "/", component: Home, name: "Home" },
     {
@@ -35,6 +35,11 @@ const routes = [
         path: "/contract/:contract_name",
         component: Contract,
         name: "Contract",
+    },
+    {
+        path: "/proofs",
+        component: Proofs,
+        name: "Proofs",
     },
 ];
 

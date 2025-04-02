@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Header from "@/explorer/Header.vue";
-import { blockStore, contractStore, transactionStore } from "@/state/data";
+import { blockStore, contractStore, transactionStore, proofStore } from "@/state/data";
 import { getNetworkNodeApiUrl, network } from "@/state/network";
 import { onMounted, ref, computed } from "vue";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
@@ -271,52 +271,120 @@ const blockTimeChartData = {
                         </RouterLink>
                     </div>
 
-                    <!-- Latest Transactions -->
-                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-medium text-secondary">Latest Transactions</h2>
-                            <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
-                                {{ transactionStore.latest.length || "15" }} recent
-                            </span>
-                        </div>
-                        <div class="divide-y divide-secondary/5">
-                            <RouterLink
-                                v-for="tx_hash in transactionStore.latest"
-                                :key="tx_hash"
-                                :to="{ name: 'Transaction', params: { tx_hash } }"
-                                class="block hover:bg-secondary/5 rounded-lg transition-colors"
-                            >
-                                <div class="flex items-center py-3 px-4">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <div class="flex items-center gap-2">
-                                                <span class="font-mono text-xs text-neutral"
-                                                    >{{ tx_hash.slice(0, 10) }}...{{ tx_hash.slice(-6) }}</span
-                                                >
-                                                <span class="text-xs text-primary px-2 py-0.5 bg-primary/5 rounded-full">
-                                                    {{ transactionStore.data[tx_hash].transaction_type }}
+                    <div class="flex flex-col gap-6">
+                        <!-- Latest Transactions -->
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-lg font-medium text-secondary">Latest Transactions</h2>
+                                <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
+                                    {{ transactionStore.latest.length || "15" }} recent
+                                </span>
+                            </div>
+                            <div class="divide-y divide-secondary/5">
+                                <RouterLink
+                                    v-for="tx_hash in transactionStore.latest"
+                                    :key="tx_hash"
+                                    :to="{ name: 'Transaction', params: { tx_hash } }"
+                                    class="block hover:bg-secondary/5 rounded-lg transition-colors"
+                                >
+                                    <div class="flex items-center py-3 px-4">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-mono text-xs text-neutral"
+                                                        >{{ tx_hash.slice(0, 10) }}...{{ tx_hash.slice(-6) }}</span
+                                                    >
+                                                    <span class="text-xs text-primary px-2 py-0.5 bg-primary/5 rounded-full">
+                                                        {{ transactionStore.data[tx_hash].transaction_type }}
+                                                    </span>
+                                                </div>
+                                                <span class="text-xs text-neutral">{{ getTimeAgo(new Date()) }} (fake)</span>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <div class="flex items-center gap-3 text-neutral">
+                                                    <span>Sender: <span class="text-secondary font-mono">(unknown)</span></span>
+                                                </div>
+                                                <span class="text-xs px-2 py-0.5 bg-green-50 text-green-600 rounded-full">
+                                                    {{ transactionStore.data[tx_hash].transaction_status }}
                                                 </span>
                                             </div>
-                                            <span class="text-xs text-neutral">{{ getTimeAgo(new Date()) }} (fake)</span>
-                                        </div>
-                                        <div class="flex items-center justify-between text-xs">
-                                            <div class="flex items-center gap-3 text-neutral">
-                                                <span>Sender: <span class="text-secondary font-mono">(unknown)</span></span>
-                                            </div>
-                                            <span class="text-xs px-2 py-0.5 bg-green-50 text-green-600 rounded-full">
-                                                {{ transactionStore.data[tx_hash].transaction_status }}
-                                            </span>
                                         </div>
                                     </div>
-                                </div>
+                                </RouterLink>
+                            </div>
+                            <RouterLink
+                                :to="{ name: 'Transactions' }"
+                                class="w-full mt-4 py-2 px-4 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary/10 transition-colors text-sm block text-center"
+                            >
+                                View All Transactions
                             </RouterLink>
                         </div>
-                        <RouterLink
-                            :to="{ name: 'Transactions' }"
-                            class="w-full mt-4 py-2 px-4 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary/10 transition-colors text-sm block text-center"
-                        >
-                            View All Transactions
-                        </RouterLink>
+
+                        <!-- Latest Proofs -->
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-lg font-medium text-secondary">Latest Proofs</h2>
+                                <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
+                                    {{ proofStore.latest.length || "0" }} recent
+                                </span>
+                            </div>
+                            <div class="divide-y divide-secondary/5">
+                                <RouterLink
+                                    v-for="proof_hash in proofStore.latest.slice(0, 5)"
+                                    :key="proof_hash"
+                                    :to="{ name: 'Transaction', params: { tx_hash: proof_hash } }"
+                                    class="block hover:bg-secondary/5 rounded-lg transition-colors"
+                                >
+                                    <div class="flex items-center py-3 px-4">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-mono text-xs text-neutral">
+                                                        {{ proof_hash.slice(0, 10) }}...{{ proof_hash.slice(-6) }}
+                                                    </span>
+                                                    <span class="text-xs text-primary px-2 py-0.5 bg-primary/5 rounded-full">
+                                                        {{ proofStore.data[proof_hash].transaction_type }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between text-xs">
+                                                <div class="flex items-center gap-3 text-neutral">
+                                                    <span
+                                                        >Block:
+                                                        <RouterLink
+                                                            :to="{
+                                                                name: 'Block',
+                                                                params: { block_hash: proofStore.data[proof_hash].block_hash },
+                                                            }"
+                                                            class="text-secondary hover:underline"
+                                                        >
+                                                            {{ proofStore.data[proof_hash].block_hash.slice(0, 8) }}...
+                                                        </RouterLink>
+                                                    </span>
+                                                </div>
+                                                <span
+                                                    class="text-xs px-2 py-0.5 rounded-full"
+                                                    :class="{
+                                                        'bg-green-50 text-green-600':
+                                                            proofStore.data[proof_hash].transaction_status === 'Success',
+                                                        'bg-red-50 text-red-600':
+                                                            proofStore.data[proof_hash].transaction_status !== 'Success',
+                                                    }"
+                                                >
+                                                    {{ proofStore.data[proof_hash].transaction_status }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </RouterLink>
+                            </div>
+                            <RouterLink
+                                :to="{ name: 'Proofs' }"
+                                class="w-full mt-4 py-2 px-4 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary/10 transition-colors text-sm block text-center"
+                            >
+                                View All Proofs
+                            </RouterLink>
+                        </div>
                     </div>
 
                     <!-- Smart Contracts - Full Width -->
