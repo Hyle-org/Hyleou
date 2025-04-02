@@ -5,7 +5,7 @@ export type ContractInfo = {
     tx_hash: string;
     verifier: string;
     program_id: string;
-    state_digest: string;
+    state_commitment: string;
     total_transactions: number;
 };
 
@@ -29,7 +29,9 @@ export class ContractStore {
         if (this.data[contract_name]) {
             return;
         }
-        const response = await fetch(`${getNetworkIndexerApiUrl(this.network)}/v1/indexer/contract/${contract_name}?no_cache=${Date.now()}`);
+        const response = await fetch(
+            `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/contract/${contract_name}?no_cache=${Date.now()}`,
+        );
         let item = await response.json();
         this.data[item.contract_name] = item;
     }

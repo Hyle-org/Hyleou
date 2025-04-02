@@ -1,10 +1,39 @@
 import { getNetworkIndexerApiUrl } from "@/state/network";
 
+export type HyleOutput = {
+    blobs: number[];
+    identity: string;
+    index: number;
+    initial_state: number[];
+    next_state: number[];
+    onchain_effects: any[];
+    program_outputs: number[];
+    success: boolean;
+    tx_ctx: any;
+    tx_hash: string;
+    version: number;
+};
+
+export type BlobInfo = {
+    contract_name: string;
+    data: string;
+    proof_outputs: HyleOutput[];
+};
+
+export type EventInfo = {
+    name: string;
+    block_hash: string;
+    metadata?: Record<string, any>;
+};
+
 export type TransactionInfo = {
     tx_hash: string;
     block_hash: string;
     transaction_type: string;
     transaction_status: string | "Success";
+    parent_dp_hash: string;
+    blobs?: BlobInfo[];
+    events?: EventInfo[];
 };
 
 export class TransactionStore {
@@ -38,16 +67,50 @@ export class TransactionStore {
         }
     }
 
-    async load(tx_hash: string) {
-        if (this.data[tx_hash]) {
-            return;
-        }
-        const response = await fetch(
-            `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transaction/hash/${tx_hash}?no_cache=${Date.now()}`,
+    private async loadBlobsAndEvents(tx: TransactionInfo) {
+        // Load blobs
+        const blobsResponse = await fetch(
+            `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/blobs/hash/${tx.tx_hash}?no_cache=${Date.now()}`,
         );
-        let item = await response.json();
-        this.data[item.tx_hash] = item;
-        this.updateTransactionsByBlock(item);
+        const blobs = await blobsResponse.json();
+        tx.blobs = blobs;
+
+        // Load events if we have a block hash
+        if (tx.block_hash) {
+            const eventsResponse = await fetch(
+                `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transaction/hash/${tx.tx_hash}/events?no_cache=${Date.now()}`,
+            );
+            const eventsData = await eventsResponse.json();
+            // Preserve block_hash and other metadata when flattening events
+            tx.events = eventsData.flatMap((eventEntry: { block_hash: string; events: Omit<EventInfo, "block_hash">[] }) =>
+                (eventEntry.events || []).map((event) => ({
+                    ...event,
+                    block_hash: eventEntry.block_hash,
+                })),
+            );
+        }
+    }
+
+    async load(tx_hash: string) {
+        let item: TransactionInfo;
+
+        if (this.data[tx_hash]) {
+            item = this.data[tx_hash];
+        } else {
+            const response = await fetch(
+                `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transaction/hash/${tx_hash}?no_cache=${Date.now()}`,
+            );
+            item = await response.json();
+            this.data[item.tx_hash] = item;
+            this.updateTransactionsByBlock(item);
+        }
+
+        // Load blobs and events if they are not already loaded
+        if (!item.blobs) {
+            await this.loadBlobsAndEvents(item);
+            // Update the store with the new data
+            this.data[item.tx_hash] = { ...item };
+        }
     }
 
     async getTransactionsByBlockHeight(height: number): Promise<string[]> {
@@ -58,10 +121,11 @@ export class TransactionStore {
         const txHashes = transactions.map((tx: TransactionInfo) => tx.tx_hash);
 
         // Cache the transactions data and update transactionsByBlock
-        transactions.forEach((tx: TransactionInfo) => {
+        for (const tx of transactions) {
+            await this.loadBlobsAndEvents(tx);
             this.data[tx.tx_hash] = tx;
             this.updateTransactionsByBlock(tx);
-        });
+        }
 
         return txHashes;
     }
