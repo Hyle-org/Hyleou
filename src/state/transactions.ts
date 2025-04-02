@@ -32,6 +32,7 @@ export type TransactionInfo = {
     transaction_type: string;
     transaction_status: string | "Success";
     parent_dp_hash: string;
+    index?: number;
     blobs?: BlobInfo[];
     events?: EventInfo[];
 };

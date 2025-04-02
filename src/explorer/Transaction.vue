@@ -1,24 +1,45 @@
 <script setup lang="ts">
 import ExplorerLayout from "@/explorer/components/ExplorerLayout.vue";
 import CopyButton from "@/components/CopyButton.vue";
-import { transactionStore } from "@/state/data";
+import { transactionStore, proofStore } from "@/state/data";
 import { getTimeAgo } from "@/state/utils";
-import { computed, watch } from "vue";
+import { computed, watch, type ComputedRef } from "vue";
 import { useRoute } from "vue-router";
+import type { TransactionInfo } from "@/state/transactions";
+import type { ProofInfo } from "@/state/proofs";
 
 const route = useRoute();
 const tx_hash = computed(() => route.params.tx_hash as string);
 
-const loadTransactionData = async () => {
-    await transactionStore.value.load(tx_hash.value);
+const loadData = async () => {
+    // Try to load from both stores - the appropriate one will have the data
+    await Promise.all([transactionStore.value.load(tx_hash.value), proofStore.value.load(tx_hash.value)]);
 };
 
 // Watch for changes in the tx_hash and reload data
-watch(() => tx_hash.value, loadTransactionData, { immediate: true });
+watch(() => tx_hash.value, loadData, { immediate: true });
 
-const data = computed(() => transactionStore.value.data?.[tx_hash.value]);
+// Take the data from either the transaction or proof store
+const data = computed<ProofInfo | TransactionInfo>(() => {
+    const txData = transactionStore.value.data?.[tx_hash.value];
+    const proofData = proofStore.value.data?.[tx_hash.value];
+    return proofData || txData;
+});
 
-const tabs = [{ name: "Overview" }, { name: "Blobs" }, { name: "Events" }, { name: "Raw JSON" }];
+// TS type guard to determine if this is a blob
+const isBlob = (
+    d: ComputedRef<TransactionInfo | ProofInfo> | TransactionInfo | ProofInfo = data,
+): d is ComputedRef<TransactionInfo> | TransactionInfo => {
+    return transactionStore.value.data?.[tx_hash.value] !== undefined;
+};
+
+// Compute tabs based on transaction type
+const tabs = computed(() => {
+    if (!isBlob(data)) {
+        return [{ name: "Overview" }, { name: "Raw JSON" }];
+    }
+    return [{ name: "Overview" }, { name: "Blobs" }, { name: "Events" }, { name: "Raw JSON" }];
+});
 
 const formatTimestamp = (date: Date) => {
     return `${getTimeAgo(date)} (${date.toLocaleString()})`;
@@ -38,12 +59,12 @@ const formatState = (state: number[]): string => {
 </script>
 
 <template>
-    <ExplorerLayout title="Transaction Details" :tabs="tabs">
+    <ExplorerLayout :title="isBlob() ? 'Transaction Details' : 'Proof Details'" :tabs="tabs">
         <template #default="{ activeTab }">
             <div v-if="activeTab === 'Overview'" class="data-card">
                 <div class="divide-y divide-secondary/5">
                     <div class="info-row">
-                        <span class="info-label">Transaction Hash:</span>
+                        <span class="info-label">{{ isBlob() ? "Transaction" : "Proof" }} Hash:</span>
                         <div class="flex items-center gap-2">
                             <span class="text-mono">{{ tx_hash }}</span>
                             <CopyButton :text="tx_hash" />
@@ -61,8 +82,8 @@ const formatState = (state: number[]): string => {
                     </div>
 
                     <div class="info-row">
-                        <span class="info-label">Transaction Type:</span>
-                        <span class="text-label">{{ data?.transaction_type || "BlobTransaction" }}</span>
+                        <span class="info-label">Type:</span>
+                        <span class="text-label">{{ data?.transaction_type || "Unknown" }}</span>
                     </div>
 
                     <div class="info-row">
@@ -97,7 +118,7 @@ const formatState = (state: number[]): string => {
                 </div>
             </div>
 
-            <div v-else-if="activeTab === 'Blobs' && data?.blobs" class="data-card">
+            <div v-else-if="activeTab === 'Blobs' && isBlob(data) && data?.blobs" class="data-card">
                 <h3 class="card-header">Blobs</h3>
                 <div>
                     <div v-for="(blob, index) in data.blobs" :key="index" class="p-4 border-b-2">
@@ -161,7 +182,7 @@ const formatState = (state: number[]): string => {
                 </div>
             </div>
 
-            <div v-else-if="activeTab === 'Events' && data?.events" class="data-card">
+            <div v-else-if="activeTab === 'Events' && isBlob(data) && data?.events" class="data-card">
                 <h3 class="card-header">Events</h3>
                 <div>
                     <div v-for="(event, index) in data.events" :key="index" class="p-4 border-b-2">
@@ -186,7 +207,7 @@ const formatState = (state: number[]): string => {
             </div>
 
             <div v-else-if="activeTab === 'Raw JSON'" class="data-card">
-                <h3 class="card-header">Transaction Data</h3>
+                <h3 class="card-header">{{ isBlob() ? "Transaction" : "Proof" }} Data</h3>
                 <pre class="code-block">{{ JSON.stringify(data, null, 2) }}</pre>
             </div>
         </template>
