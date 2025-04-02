@@ -59,8 +59,8 @@ const tabs = [{ name: "Overview" }, { name: "Raw JSON" }];
                     <div class="info-row">
                         <span class="info-label">State Commitment:</span>
                         <div class="flex items-center gap-2 flex-1">
-                            <span class="text-mono break-all">{{ data?.state_digest }}</span>
-                            <CopyButton v-if="data?.state_digest" :text="data.state_digest" />
+                            <span class="text-label">{{ data?.state_commitment }}</span>
+                            <CopyButton v-if="data?.state_commitment" :text="data.state_commitment" />
                         </div>
                     </div>
 
