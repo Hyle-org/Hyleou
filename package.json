@@ -17,6 +17,7 @@
         "chart.js": "^4.4.8",
         "dotenv": "^16.4.7",
         "face-api.js": "^0.22.2",
+        "hyle": "^0.2.4",
         "pkijs": "^3.2.5",
         "protobufjs": "^7.4.0",
         "rollup-plugin-copy": "^3.5.0",
