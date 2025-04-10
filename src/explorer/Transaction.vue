@@ -3,10 +3,11 @@ import ExplorerLayout from "@/explorer/components/ExplorerLayout.vue";
 import CopyButton from "@/components/CopyButton.vue";
 import { transactionStore, proofStore } from "@/state/data";
 import { getTimeAgo } from "@/state/utils";
-import { computed, watch, type ComputedRef } from "vue";
+import { computed, watch, type ComputedRef, ref } from "vue";
 import { useRoute } from "vue-router";
 import type { TransactionInfo } from "@/state/transactions";
 import type { ProofInfo } from "@/state/proofs";
+import { decodeBlobData } from "@/explorer/utils/blobDecoder";
 
 const route = useRoute();
 const tx_hash = computed(() => route.params.tx_hash as string);
@@ -55,6 +56,17 @@ const decodeBytes = (bytes: number[]): string => {
 
 const formatState = (state: number[]): string => {
     return state.map((b) => b.toString(16).padStart(2, "0")).join("");
+};
+
+// Track which blobs are showing raw data
+const rawDataBlobs = ref(new Set<number>());
+
+const toggleRawData = (index: number) => {
+    if (rawDataBlobs.value.has(index)) {
+        rawDataBlobs.value.delete(index);
+    } else {
+        rawDataBlobs.value.add(index);
+    }
 };
 </script>
 
@@ -133,9 +145,20 @@ const formatState = (state: number[]): string => {
                         <div class="space-y-2">
                             <div class="flex items-center gap-2">
                                 <span class="text-sm text-neutral">Data:</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-mono text-sm break-all">{{ blob.data }}</span>
-                                    <CopyButton :text="blob.data" />
+                                <div class="flex flex-col gap-2 w-full">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-full">
+                                            <pre v-if="!rawDataBlobs.has(index)" class="code-block">{{ decodeBlobData(blob.data, blob.contract_name) }}</pre>
+                                            <span v-else class="text-mono text-sm break-all">{{ blob.data }}</span>
+                                        </div>
+                                        <CopyButton :text="blob.data" />
+                                        <button 
+                                            @click="toggleRawData(index)"
+                                            class="text-xs px-2 py-1 rounded bg-secondary/10 hover:bg-secondary/20 transition-colors whitespace-nowrap"
+                                        >
+                                            {{ rawDataBlobs.has(index) ? 'Show Decoded' : 'Show Raw' }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div v-if="blob.proof_outputs && blob.proof_outputs.length > 0">
