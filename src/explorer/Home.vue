@@ -97,7 +97,7 @@ const blockTimeChartData = {
         <Header />
         <div class="container mx-auto px-4 py-12">
             <div class="mb-12 max-w-4xl mx-auto text-center">
-                <h1 class="text-4xl font-display text-secondary mb-3">Explore Hylé</h1>
+                <h1 class="text-4xl font-display text-primary mb-3">Explore Hylé</h1>
                 <p class="text-neutral text-lg mb-8">Search transactions, explore blocks, or discover smart contracts</p>
                 <!-- Search bar -->
                 <div class="relative bg-white/40 backdrop-blur-md rounded-2xl shadow-lg p-2">
@@ -220,7 +220,7 @@ const blockTimeChartData = {
                     <!-- Latest Blocks -->
                     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-medium text-secondary">Latest Blocks</h2>
+                            <h2 class="text-lg font-medium text-primary">Latest Blocks</h2>
                             <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                 Height {{ blockStore.latest[0] ? blockStore.data[blockStore.latest[0]].height : "37,382" }}
                             </span>
@@ -275,7 +275,7 @@ const blockTimeChartData = {
                         <!-- Latest Transactions -->
                         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                             <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-medium text-secondary">Latest Transactions</h2>
+                                <h2 class="text-lg font-medium text-primary">Latest Transactions</h2>
                                 <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                     {{ transactionStore.latest.length || "15" }} recent
                                 </span>
@@ -323,7 +323,7 @@ const blockTimeChartData = {
                         <!-- Latest Proofs -->
                         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                             <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-medium text-secondary">Latest Proofs</h2>
+                                <h2 class="text-lg font-medium text-primary">Latest Proofs</h2>
                                 <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                     {{ proofStore.latest.length || "0" }} recent
                                 </span>
@@ -390,7 +390,7 @@ const blockTimeChartData = {
                     <!-- Smart Contracts - Full Width -->
                     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20 md:col-span-2">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-medium text-secondary">Smart Contracts</h2>
+                            <h2 class="text-lg font-medium text-primary">Smart Contracts</h2>
                             <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                 {{ Object.keys(contractStore.data).length }} total
                             </span>
