@@ -1,19 +1,19 @@
-import { ref, Ref } from 'vue';
-import { BlockStore, BlockInfo } from '@/state/blocks';
+import {  BlockInfo } from '@/state/blocks';
+import { TransactionInfo } from '@/state/transactions';
+import { blockStore, transactionStore } from "@/state/data";
 
 export interface Event {
     NewBlock: BlockInfo;
+    NewTx: TransactionInfo;
 }
 
 export class WebSocketService {
     private ws: WebSocket | null = null;
     private reconnectTimeout: number | null = null;
     private url: string;
-    private blockStore: Ref<BlockStore>;
 
-    constructor(url: string, blockStore: Ref<BlockStore>) {
+    constructor(url: string) {
         this.url = url;
-        this.blockStore = blockStore;
     }
 
     connect() {
@@ -23,6 +23,7 @@ export class WebSocketService {
             console.log('WebSocket connected');
             // Register for new blocks topic
             this.ws?.send(JSON.stringify({ RegisterTopic: "new_block" }));
+            this.ws?.send(JSON.stringify({ RegisterTopic: "new_tx" }));
             if (this.reconnectTimeout) {
                 clearTimeout(this.reconnectTimeout);
                 this.reconnectTimeout = null;
@@ -31,7 +32,12 @@ export class WebSocketService {
 
         this.ws.onmessage = (event) => {
             const parsed: Event = JSON.parse(event.data);
-            this.handleNewBlock(parsed.NewBlock);
+            if (parsed.NewBlock) {
+                this.handleNewBlock(parsed.NewBlock);
+            }
+            if (parsed.NewTx) {
+                this.handleNewTx(parsed.NewTx);
+            }
         };
 
         this.ws.onerror = (error) => {
@@ -46,7 +52,13 @@ export class WebSocketService {
 
     private handleNewBlock(block: BlockInfo) {
         console.log('New block:', block);
-        this.blockStore.handleNewBlock(block);
+        blockStore.value.handleNewBlock(block);
+    }
+
+    private handleNewTx(tx: TransactionInfo) {
+        if (tx.transaction_type === "BlobTransaction") {
+            transactionStore.value.handleNewTx(tx);
+        }  
     }
 
     private reconnect() {

@@ -21,7 +21,7 @@ const fetchConsensusInfo = async () => {
 
 onMounted(() => {
     fetchConsensusInfo();
-    wsService.value = new WebSocketService('ws://localhost:8080/ws', blockStore);
+    wsService.value = new WebSocketService('ws://localhost:8080/ws');
     wsService.value.connect();
 });
 
