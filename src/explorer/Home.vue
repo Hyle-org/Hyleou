@@ -2,22 +2,33 @@
 import Header from "@/explorer/Header.vue";
 import { blockStore, contractStore, transactionStore, proofStore } from "@/state/data";
 import { getNetworkNodeApiUrl, network } from "@/state/network";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, onUnmounted } from "vue";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import NetworkChart from "@/explorer/components/NetworkChart.vue";
 import { useRouter } from "vue-router";
 import { getTimeAgo } from "@/state/utils";
+import { WebSocketService } from "@/services/websocket";
 
 const router = useRouter();
 const searchQuery = ref("");
+const wsService = ref<WebSocketService | null>(null);
 
 const consensusInfo = ref<null | { validators: string[] }>(null);
 const fetchConsensusInfo = async () => {
     const response = await fetch(getNetworkNodeApiUrl(network.value) + `/v1/consensus/info?no_cache=${Date.now()}`);
     consensusInfo.value = await response.json();
 };
+
 onMounted(() => {
     fetchConsensusInfo();
+    wsService.value = new WebSocketService('ws://localhost:8080/ws', blockStore);
+    wsService.value.connect();
+});
+
+onUnmounted(() => {
+    if (wsService.value) {
+        wsService.value.disconnect();
+    }
 });
 
 // Compute average block time from the latest blocks
