@@ -169,6 +169,10 @@ const blockTimeChartData = {
                                 />
                             </svg>
                             <h3 class="text-sm font-medium text-neutral uppercase">Current Block</h3>
+                            <span class="flex items-center gap-1 text-xs text-green-500">
+                                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                Live
+                            </span>
                         </div>
                         <p class="text-3xl font-display text-primary mb-2">
                             #{{ blockStore.latest[0] ? blockStore.data[blockStore.latest[0]].height : "37,382" }}
@@ -231,7 +235,13 @@ const blockTimeChartData = {
                     <!-- Latest Blocks -->
                     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-medium text-primary">Latest Blocks</h2>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg font-medium text-primary">Latest Blocks</h2>
+                                <span class="flex items-center gap-1 text-xs text-green-500">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                    Live
+                                </span>
+                            </div>
                             <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                 Height {{ blockStore.latest[0] ? blockStore.data[blockStore.latest[0]].height : "37,382" }}
                             </span>
@@ -286,7 +296,13 @@ const blockTimeChartData = {
                         <!-- Latest Transactions -->
                         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                             <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-medium text-primary">Latest Transactions</h2>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-lg font-medium text-primary">Latest Transactions</h2>
+                                    <span class="flex items-center gap-1 text-xs text-green-500">
+                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                        Live
+                                    </span>
+                                </div>
                                 <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                     {{ transactionStore.latest.length || "15" }} recent
                                 </span>
