@@ -114,6 +114,12 @@ export class TransactionStore {
         }
     }
 
+    handleNewTx(tx: TransactionInfo) {
+        this.data[tx.tx_hash] = tx;
+        this.latest.unshift(tx.tx_hash);
+        this.updateTransactionsByBlock(tx);
+    }
+
     async getTransactionsByBlockHeight(height: number): Promise<string[]> {
         const response = await fetch(
             `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transactions/block/${height}?no_cache=${Date.now()}`,

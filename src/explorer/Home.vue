@@ -2,22 +2,33 @@
 import Header from "@/explorer/Header.vue";
 import { blockStore, contractStore, transactionStore, proofStore } from "@/state/data";
 import { getNetworkNodeApiUrl, network } from "@/state/network";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, onUnmounted } from "vue";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import NetworkChart from "@/explorer/components/NetworkChart.vue";
 import { useRouter } from "vue-router";
 import { getTimeAgo } from "@/state/utils";
+import { WebSocketService } from "@/services/websocket";
 
 const router = useRouter();
 const searchQuery = ref("");
+const wsService = ref<WebSocketService | null>(null);
 
 const consensusInfo = ref<null | { validators: string[] }>(null);
 const fetchConsensusInfo = async () => {
     const response = await fetch(getNetworkNodeApiUrl(network.value) + `/v1/consensus/info?no_cache=${Date.now()}`);
     consensusInfo.value = await response.json();
 };
+
 onMounted(() => {
     fetchConsensusInfo();
+    wsService.value = new WebSocketService('ws://localhost:8080/ws');
+    wsService.value.connect();
+});
+
+onUnmounted(() => {
+    if (wsService.value) {
+        wsService.value.disconnect();
+    }
 });
 
 // Compute average block time from the latest blocks
@@ -97,7 +108,7 @@ const blockTimeChartData = {
         <Header />
         <div class="container mx-auto px-4 py-12">
             <div class="mb-12 max-w-4xl mx-auto text-center">
-                <h1 class="text-4xl font-display text-secondary mb-3">Explore Hylé</h1>
+                <h1 class="text-4xl font-display text-primary mb-3">Explore Hylé</h1>
                 <p class="text-neutral text-lg mb-8">Search transactions, explore blocks, or discover smart contracts</p>
                 <!-- Search bar -->
                 <div class="relative bg-white/40 backdrop-blur-md rounded-2xl shadow-lg p-2">
@@ -158,6 +169,10 @@ const blockTimeChartData = {
                                 />
                             </svg>
                             <h3 class="text-sm font-medium text-neutral uppercase">Current Block</h3>
+                            <span class="flex items-center gap-1 text-xs text-green-500">
+                                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                Live
+                            </span>
                         </div>
                         <p class="text-3xl font-display text-primary mb-2">
                             #{{ blockStore.latest[0] ? blockStore.data[blockStore.latest[0]].height : "37,382" }}
@@ -220,7 +235,13 @@ const blockTimeChartData = {
                     <!-- Latest Blocks -->
                     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-medium text-secondary">Latest Blocks</h2>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg font-medium text-primary">Latest Blocks</h2>
+                                <span class="flex items-center gap-1 text-xs text-green-500">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                    Live
+                                </span>
+                            </div>
                             <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                 Height {{ blockStore.latest[0] ? blockStore.data[blockStore.latest[0]].height : "37,382" }}
                             </span>
@@ -275,7 +296,13 @@ const blockTimeChartData = {
                         <!-- Latest Transactions -->
                         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                             <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-medium text-secondary">Latest Transactions</h2>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-lg font-medium text-primary">Latest Transactions</h2>
+                                    <span class="flex items-center gap-1 text-xs text-green-500">
+                                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                        Live
+                                    </span>
+                                </div>
                                 <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                     {{ transactionStore.latest.length || "15" }} recent
                                 </span>
@@ -323,7 +350,7 @@ const blockTimeChartData = {
                         <!-- Latest Proofs -->
                         <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20">
                             <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-medium text-secondary">Latest Proofs</h2>
+                                <h2 class="text-lg font-medium text-primary">Latest Proofs</h2>
                                 <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                     {{ proofStore.latest.length || "0" }} recent
                                 </span>
@@ -390,7 +417,7 @@ const blockTimeChartData = {
                     <!-- Smart Contracts - Full Width -->
                     <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm p-6 border border-white/20 md:col-span-2">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-lg font-medium text-secondary">Smart Contracts</h2>
+                            <h2 class="text-lg font-medium text-primary">Smart Contracts</h2>
                             <span class="text-xs bg-secondary/5 px-3 py-1 rounded-full text-neutral">
                                 {{ Object.keys(contractStore.data).length }} total
                             </span>
