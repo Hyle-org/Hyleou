@@ -42,8 +42,8 @@ const tabs = computed(() => {
     return [{ name: "Overview" }, { name: "Blobs" }, { name: "Events" }, { name: "Raw JSON" }];
 });
 
-const formatTimestamp = (date: Date) => {
-    return `${getTimeAgo(date)} (${date.toLocaleString()})`;
+const formatTimestamp = (date: number) => {
+    return `${getTimeAgo(date)} (${new Date(date).toLocaleString()})`;
 };
 
 const decodeBytes = (bytes: number[]): string => {
@@ -125,7 +125,7 @@ const toggleRawData = (index: number) => {
 
                     <div class="info-row">
                         <span class="info-label">Timestamp:</span>
-                        <span class="text-label">{{ formatTimestamp(new Date()) }} (fake)</span>
+                        <span class="text-label">{{ formatTimestamp(data.timestamp) }}</span>
                     </div>
                 </div>
             </div>
