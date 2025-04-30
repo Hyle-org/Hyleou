@@ -12,6 +12,14 @@ import { WebSocketService } from "@/services/websocket";
 const router = useRouter();
 const searchQuery = ref("");
 const wsService = ref<WebSocketService | null>(null);
+const stats = ref<null | {
+    total_transactions: number;
+    txs_last_day: number;
+    total_contracts: number;
+    contracts_last_day: number;
+    graph_tx_volume: [number, number][];
+    graph_block_time: [number, number][];
+}>(null);
 
 const consensusInfo = ref<null | { validators: string[] }>(null);
 const fetchConsensusInfo = async () => {
@@ -19,8 +27,14 @@ const fetchConsensusInfo = async () => {
     consensusInfo.value = await response.json();
 };
 
+const fetchStats = async () => {
+    const response = await fetch(getNetworkNodeApiUrl(network.value) + `/v1/indexer/stats?no_cache=${Date.now()}`);
+    stats.value = await response.json();
+};
+
 onMounted(() => {
     fetchConsensusInfo();
+    fetchStats();
     wsService.value = new WebSocketService('ws://localhost:8080/ws');
     wsService.value.connect();
 });
@@ -72,35 +86,41 @@ const handleSearch = () => {
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-// TODO: real data
-const transactionChartData = {
-    labels: ["6h ago", "5h ago", "4h ago", "3h ago", "2h ago", "1h ago", "Now"],
+// Update transaction chart data with real data
+const transactionChartData = computed(() => ({
+    labels: stats.value?.graph_tx_volume.map(([timestamp]) => {
+        const date = new Date(timestamp * 1000);
+        return getTimeAgo(date.toISOString());
+    }) || [],
     datasets: [
         {
             label: "Transactions per Hour",
-            data: [65, 59, 80, 81, 56, 55, 40],
+            data: stats.value?.graph_tx_volume.map(([_, value]) => value) || [],
             fill: true,
             borderColor: "#DF6445",
             backgroundColor: "rgba(223, 100, 69, 0.1)",
             tension: 0.4,
         },
     ],
-};
+}));
 
-// TODO: real data
-const blockTimeChartData = {
-    labels: ["6h ago", "5h ago", "4h ago", "3h ago", "2h ago", "1h ago", "Now"],
+// Update block time chart data with real data
+const blockTimeChartData = computed(() => ({
+    labels: stats.value?.graph_block_time.map(([timestamp]) => {
+        const date = new Date(timestamp * 1000);
+        return getTimeAgo(date.toISOString());
+    }) || [],
     datasets: [
         {
             label: "Block Time (seconds)",
-            data: [0.5, 0.48, 0.52, 0.49, 0.51, 0.47, 0.5],
+            data: stats.value?.graph_block_time.map(([_, value]) => value) || [],
             fill: true,
             borderColor: "#DF6445",
             backgroundColor: "rgba(223, 100, 69, 0.1)",
             tension: 0.4,
         },
     ],
-};
+}));
 </script>
 
 <template>
@@ -151,10 +171,10 @@ const blockTimeChartData = {
                             </svg>
                             <h3 class="text-sm font-medium text-neutral uppercase">Total Transactions</h3>
                         </div>
-                        <p class="text-3xl font-display text-primary mb-2">{{ transactionStore.latest.length || "156,042" }}</p>
+                        <p class="text-3xl font-display text-primary mb-2">{{ stats?.total_transactions || transactionStore.latest.length }}</p>
                         <div class="grid grid-cols-2 gap-2 text-xs text-neutral">
-                            <div>24H Tx: <span class="text-secondary">15,231 (fake)</span></div>
-                            <div>TPS: <span class="text-secondary">23.5 (fake)</span></div>
+                            <div>24H Tx: <span class="text-secondary">{{ stats?.txs_last_day || "0" }}</span></div>
+                            <div>TPS: <span class="text-secondary">{{ ((stats?.txs_last_day || 0) / 86400).toFixed(2) }}</span></div>
                         </div>
                     </div>
 
@@ -196,10 +216,10 @@ const blockTimeChartData = {
                             </svg>
                             <h3 class="text-sm font-medium text-neutral uppercase">Smart Contracts</h3>
                         </div>
-                        <p class="text-3xl font-display text-primary mb-2">{{ Object.keys(contractStore.data).length || "8" }}</p>
+                        <p class="text-3xl font-display text-primary mb-2">{{ stats?.total_contracts || Object.keys(contractStore.data).length }}</p>
                         <div class="grid grid-cols-2 gap-2 text-xs text-neutral">
-                            <div>24H New: <span class="text-secondary">2 (fake)</span></div>
-                            <div>Active: <span class="text-secondary">6 (fake)</span></div>
+                            <div>24H New: <span class="text-secondary">{{ stats?.contracts_last_day || "0" }}</span></div>
+                            <div>Active: <span class="text-secondary">{{ stats?.total_contracts || "0" }}</span></div>
                         </div>
                     </div>
 
