@@ -8,6 +8,7 @@ export type ProofInfo = {
     transaction_status: string;
     block_hash: string;
     index: number;
+    timestamp: number;
 };
 
 export class ProofStore {

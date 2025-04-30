@@ -325,7 +325,7 @@ const blockTimeChartData = {
                                                         {{ transactionStore.data[tx_hash].transaction_type }}
                                                     </span>
                                                 </div>
-                                                <span class="text-xs text-neutral">{{ getTimeAgo(new Date()) }} (fake)</span>
+                                                <span class="text-xs text-neutral">{{ getTimeAgo(transactionStore.data[tx_hash].timestamp) }}</span>
                                             </div>
                                             <div class="flex items-center justify-between text-xs">
                                                 <div class="flex items-center gap-3 text-neutral">
@@ -373,6 +373,7 @@ const blockTimeChartData = {
                                                         {{ proofStore.data[proof_hash].transaction_type }}
                                                     </span>
                                                 </div>
+                                                <span class="text-xs text-neutral">{{ getTimeAgo(proofStore.data[proof_hash].timestamp) }}</span>
                                             </div>
                                             <div class="flex items-center justify-between text-xs">
                                                 <div class="flex items-center gap-3 text-neutral">
