@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from "@/explorer/Header.vue";
 import { blockStore, contractStore, transactionStore, proofStore } from "@/state/data";
-import { getNetworkNodeApiUrl, network } from "@/state/network";
+import { getNetworkNodeApiUrl, getNetworkWebSocketUrl, network } from "@/state/network";
 import { onMounted, ref, computed, onUnmounted } from "vue";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import NetworkChart from "@/explorer/components/NetworkChart.vue";
@@ -35,7 +35,7 @@ const fetchStats = async () => {
 onMounted(() => {
     fetchConsensusInfo();
     fetchStats();
-    wsService.value = new WebSocketService('ws://localhost:8080/ws');
+    wsService.value = new WebSocketService(getNetworkWebSocketUrl(network.value) + "/ws");
     wsService.value.connect();
 });
 
@@ -88,10 +88,11 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 // Update transaction chart data with real data
 const transactionChartData = computed(() => ({
-    labels: stats.value?.graph_tx_volume.map(([timestamp]) => {
-        const date = new Date(timestamp * 1000);
-        return getTimeAgo(date.toISOString());
-    }) || [],
+    labels:
+        stats.value?.graph_tx_volume.map(([timestamp]) => {
+            const date = new Date(timestamp * 1000);
+            return getTimeAgo(date.toISOString());
+        }) || [],
     datasets: [
         {
             label: "Transactions per Hour",
@@ -106,10 +107,11 @@ const transactionChartData = computed(() => ({
 
 // Update block time chart data with real data
 const blockTimeChartData = computed(() => ({
-    labels: stats.value?.graph_block_time.map(([timestamp]) => {
-        const date = new Date(timestamp * 1000);
-        return getTimeAgo(date.toISOString());
-    }) || [],
+    labels:
+        stats.value?.graph_block_time.map(([timestamp]) => {
+            const date = new Date(timestamp * 1000);
+            return getTimeAgo(date.toISOString());
+        }) || [],
     datasets: [
         {
             label: "Block Time (seconds)",
@@ -171,10 +173,16 @@ const blockTimeChartData = computed(() => ({
                             </svg>
                             <h3 class="text-sm font-medium text-neutral uppercase">Total Transactions</h3>
                         </div>
-                        <p class="text-3xl font-display text-primary mb-2">{{ stats?.total_transactions || transactionStore.latest.length }}</p>
+                        <p class="text-3xl font-display text-primary mb-2">
+                            {{ stats?.total_transactions || transactionStore.latest.length }}
+                        </p>
                         <div class="grid grid-cols-2 gap-2 text-xs text-neutral">
-                            <div>24H Tx: <span class="text-secondary">{{ stats?.txs_last_day || "0" }}</span></div>
-                            <div>TPS: <span class="text-secondary">{{ ((stats?.txs_last_day || 0) / 86400).toFixed(2) }}</span></div>
+                            <div>
+                                24H Tx: <span class="text-secondary">{{ stats?.txs_last_day || "0" }}</span>
+                            </div>
+                            <div>
+                                TPS: <span class="text-secondary">{{ ((stats?.txs_last_day || 0) / 86400).toFixed(2) }}</span>
+                            </div>
                         </div>
                     </div>
 
@@ -216,10 +224,16 @@ const blockTimeChartData = computed(() => ({
                             </svg>
                             <h3 class="text-sm font-medium text-neutral uppercase">Smart Contracts</h3>
                         </div>
-                        <p class="text-3xl font-display text-primary mb-2">{{ stats?.total_contracts || Object.keys(contractStore.data).length }}</p>
+                        <p class="text-3xl font-display text-primary mb-2">
+                            {{ stats?.total_contracts || Object.keys(contractStore.data).length }}
+                        </p>
                         <div class="grid grid-cols-2 gap-2 text-xs text-neutral">
-                            <div>24H New: <span class="text-secondary">{{ stats?.contracts_last_day || "0" }}</span></div>
-                            <div>Active: <span class="text-secondary">{{ stats?.total_contracts || "0" }}</span></div>
+                            <div>
+                                24H New: <span class="text-secondary">{{ stats?.contracts_last_day || "0" }}</span>
+                            </div>
+                            <div>
+                                Active: <span class="text-secondary">{{ stats?.total_contracts || "0" }}</span>
+                            </div>
                         </div>
                     </div>
 
@@ -345,7 +359,9 @@ const blockTimeChartData = computed(() => ({
                                                         {{ transactionStore.data[tx_hash].transaction_type }}
                                                     </span>
                                                 </div>
-                                                <span class="text-xs text-neutral">{{ getTimeAgo(transactionStore.data[tx_hash].timestamp) }}</span>
+                                                <span class="text-xs text-neutral">{{
+                                                    getTimeAgo(transactionStore.data[tx_hash].timestamp)
+                                                }}</span>
                                             </div>
                                             <div class="flex items-center justify-between text-xs">
                                                 <div class="flex items-center gap-3 text-neutral">
@@ -393,7 +409,9 @@ const blockTimeChartData = computed(() => ({
                                                         {{ proofStore.data[proof_hash].transaction_type }}
                                                     </span>
                                                 </div>
-                                                <span class="text-xs text-neutral">{{ getTimeAgo(proofStore.data[proof_hash].timestamp) }}</span>
+                                                <span class="text-xs text-neutral">{{
+                                                    getTimeAgo(proofStore.data[proof_hash].timestamp)
+                                                }}</span>
                                             </div>
                                             <div class="flex items-center justify-between text-xs">
                                                 <div class="flex items-center gap-3 text-neutral">

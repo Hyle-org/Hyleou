@@ -29,8 +29,8 @@ const data = computed<ProofInfo | TransactionInfo>(() => {
 
 // TS type guard to determine if this is a blob
 const isBlob = (
-    d: ComputedRef<TransactionInfo | ProofInfo> | TransactionInfo | ProofInfo = data,
-): d is ComputedRef<TransactionInfo> | TransactionInfo => {
+    _d: ComputedRef<TransactionInfo | ProofInfo> | TransactionInfo | ProofInfo = data,
+): _d is ComputedRef<TransactionInfo> | TransactionInfo => {
     return transactionStore.value.data?.[tx_hash.value] !== undefined;
 };
 
@@ -148,15 +148,17 @@ const toggleRawData = (index: number) => {
                                 <div class="flex flex-col gap-2 w-full">
                                     <div class="flex items-center gap-2">
                                         <div class="w-full">
-                                            <pre v-if="!rawDataBlobs.has(index)" class="code-block">{{ decodeBlobData(blob.data, blob.contract_name) }}</pre>
+                                            <pre v-if="!rawDataBlobs.has(index)" class="code-block">{{
+                                                decodeBlobData(blob.data, blob.contract_name)
+                                            }}</pre>
                                             <span v-else class="text-mono text-sm break-all">{{ blob.data }}</span>
                                         </div>
                                         <CopyButton :text="blob.data" />
-                                        <button 
+                                        <button
                                             @click="toggleRawData(index)"
                                             class="text-xs px-2 py-1 rounded bg-secondary/10 hover:bg-secondary/20 transition-colors whitespace-nowrap"
                                         >
-                                            {{ rawDataBlobs.has(index) ? 'Show Decoded' : 'Show Raw' }}
+                                            {{ rawDataBlobs.has(index) ? "Show Decoded" : "Show Raw" }}
                                         </button>
                                     </div>
                                 </div>
@@ -208,7 +210,7 @@ const toggleRawData = (index: number) => {
             <div v-else-if="activeTab === 'Events' && isBlob(data) && data?.events" class="data-card">
                 <h3 class="card-header">Events</h3>
                 <div>
-                    <div v-for="(event, index) in data.events" :key="index" class="p-4 border-b-2">
+                    <div v-for="(event, index) in [...data.events].reverse()" :key="index" class="p-4 border-b-2">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-medium text-secondary">Event #{{ index + 1 }}: {{ event.name }}</span>
                             <RouterLink
