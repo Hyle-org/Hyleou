@@ -3,6 +3,7 @@ import { deserializeHydentityAction } from "@/model/hydentity";
 import { deserializeBlackJackAction } from "@/model/blackjack";
 import { deserializeSecp256k1Blob } from "@/model/seckp2256k1";
 import { deserializeWalletAction } from "@/model/wallet";
+import { deserializeHyleAction } from "@/model/hyle";
 
 export const parseHexToVec = (hex: string): number[] | null => {
     const tokens = hex.match(/[0-9a-f]{2}/gi);
@@ -53,6 +54,9 @@ export const decodeBlobData = (hex: string, contractName: string): string => {
         if (data === null) return "Invalid hex data";
 
         switch (contractName) {
+            case "hyle":
+                const hyleAction = deserializeHyleAction(data);
+                return formatObject(hyleAction);
             case "hyllar":
                 const erc20Action = hyle.token.deserializeERC20Action(data);
                 return formatObject(erc20Action);
