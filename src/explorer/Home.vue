@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from "@/explorer/Header.vue";
 import { blockStore, contractStore, transactionStore, proofStore } from "@/state/data";
-import { getNetworkNodeApiUrl, getNetworkWebSocketUrl, network } from "@/state/network";
+import { getNetworkNodeApiUrl, getNetworkIndexerApiUrl, getNetworkWebSocketUrl, network } from "@/state/network";
 import { onMounted, ref, computed, onUnmounted } from "vue";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import NetworkChart from "@/explorer/components/NetworkChart.vue";
@@ -28,7 +28,7 @@ const fetchConsensusInfo = async () => {
 };
 
 const fetchStats = async () => {
-    const response = await fetch(getNetworkNodeApiUrl(network.value) + `/v1/indexer/stats?no_cache=${Date.now()}`);
+    const response = await fetch(getNetworkIndexerApiUrl(network.value) + `/v1/indexer/stats?no_cache=${Date.now()}`);
     stats.value = await response.json();
 };
 
