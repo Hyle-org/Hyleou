@@ -6,7 +6,8 @@ export type ContractInfo = {
     verifier: string;
     program_id: string;
     state_commitment: string;
-    total_transactions: number;
+    total_tx: number;
+    unsettled_tx: number;
 };
 
 export class ContractStore {

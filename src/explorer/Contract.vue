@@ -66,7 +66,11 @@ const tabs = [{ name: "Overview" }, { name: "Raw JSON" }];
 
                     <div class="info-row">
                         <span class="info-label">Total Transactions:</span>
-                        <span class="text-label">{{ data?.total_transactions || "0" }}</span>
+                        <span class="text-label">{{ data?.total_tx || "0" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Total unsettled Transactions:</span>
+                        <span class="text-label">{{ data?.unsettled_tx || "0" }}</span>
                     </div>
                 </div>
             </div>
