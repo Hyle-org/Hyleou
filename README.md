@@ -1,6 +1,6 @@
-# Hyléoù
+# Hyli explorer
 
-WIP, minimalistic explorer for the Hylé chain.
+Explorer for the Hyli blockchain.
 
 ### Development
 
