@@ -35,21 +35,22 @@ export const network = persistentRef("network", "devnet");
 export const getNetworkIndexerApiUrl = (network: string) => {
     return {
         localhost: "http://localhost:4321",
-        devnet: "https://indexer.devnet.hyle.eu",
-        testnet: "https://indexer.testnet.hyle.eu",
+        devnet: "https://indexer.devnet.hyli.org",
+        testnet: "https://indexer.testnet.hyli.org",
     }[network];
 };
 export const getNetworkNodeApiUrl = (network: string) => {
     return {
         localhost: "http://localhost:4321",
-        devnet: "https://node.devnet.hyle.eu",
-        testnet: "https://node.testnet.hyle.eu",
+        devnet: "https://node.devnet.hyli.org",
+        testnet: "https://node.testnet.hyli.org",
     }[network];
 };
 export const getNetworkWebSocketUrl = (network: string) => {
     return {
         localhost: "ws://localhost:8080",
-        devnet: "wss://ws.devnet.hyle.eu",
-        testnet: "wss://ws.testnet.hyle.eu",
+        devnet: "wss://ws.devnet.hyli.org",
+        testnet: "wss://ws.testnet.hyli.org",
     }[network];
 };
+
