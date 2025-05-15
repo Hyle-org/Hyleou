@@ -47,7 +47,7 @@ const formatTimestamp = (date: Date) => {
 
                     <div class="info-row">
                         <span class="info-label">Height:</span>
-                        <span class="text-label">#{{ data?.height || "..." }}</span>
+                        <span class="text-label">#{{ data?.height === undefined ? "..." : data.height }}</span>
                     </div>
 
                     <div class="info-row">

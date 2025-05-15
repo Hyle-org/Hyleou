@@ -5,7 +5,7 @@ export type BlockInfo = {
     parent_hash: string;
     height: number;
     timestamp: Date;
-    //txs: string[];
+    total_txs: number;
 };
 
 export class BlockStore {

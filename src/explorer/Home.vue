@@ -302,16 +302,16 @@ const blockTimeChartData = computed(() => ({
                                         </div>
                                         <div class="flex items-center justify-between text-xs">
                                             <div class="flex items-center gap-3 text-neutral">
-                                                <span
-                                                    >Transactions:
+                                                <span>
+                                                    Transactions:
                                                     <span class="text-secondary">{{
-                                                        transactionStore.transactionsByBlock?.[hash]?.length || "..."
-                                                    }}</span></span
-                                                >
-                                                <span>Size: <span class="text-secondary">24.5 KB (fake)</span></span>
+                                                        blockStore.data[hash].total_txs || "0"
+                                                    }}</span>
+                                                </span>
+                                                <!-- <span>Size: <span class="text-secondary">24.5 KB (fake)</span></span> -->
                                             </div>
                                             <span class="text-xs px-2 py-0.5 bg-primary/5 text-primary rounded-full">
-                                                Finalized (fake)
+                                                Finalized
                                             </span>
                                         </div>
                                     </div>
