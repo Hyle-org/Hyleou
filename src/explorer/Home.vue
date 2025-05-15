@@ -130,7 +130,7 @@ const blockTimeChartData = computed(() => ({
         <Header />
         <div class="container mx-auto px-4 py-12">
             <div class="mb-12 max-w-4xl mx-auto text-center">
-                <h1 class="text-4xl font-display text-primary mb-3">Explore Hylé</h1>
+                <h1 class="text-4xl font-display text-primary mb-3">Explore Hyli</h1>
                 <p class="text-neutral text-lg mb-8">Search transactions, explore blocks, or discover smart contracts</p>
                 <!-- Search bar -->
                 <div class="relative bg-white/40 backdrop-blur-md rounded-2xl shadow-lg p-2">

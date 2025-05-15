@@ -92,7 +92,7 @@ onMounted(async () => {
         <main class="container mx-auto px-4 py-6">
             <div class="mb-6">
                 <h1 class="text-2xl font-display text-secondary mb-4">All Blocks</h1>
-                <p class="text-neutral">Explore all blocks in the Hylé blockchain</p>
+                <p class="text-neutral">Explore all blocks in the Hyli blockchain</p>
             </div>
 
             <!-- Blocks List -->
