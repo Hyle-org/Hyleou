@@ -95,6 +95,7 @@ function setActiveTab(tab: string) {
 
 .text-label {
     @apply text-secondary font-medium;
+    word-break: break-all;
 }
 
 /* Status indicator */
