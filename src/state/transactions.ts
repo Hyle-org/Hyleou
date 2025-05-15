@@ -43,6 +43,7 @@ export class TransactionStore {
     data: Record<string, TransactionInfo> = {};
     latest: string[] = [];
     transactionsByBlock: Record<string, string[]> = {};
+    transactionsByContract: Record<string, string[]> = {};
 
     constructor(network: string) {
         this.network = network;
@@ -59,6 +60,21 @@ export class TransactionStore {
         }
     }
 
+    private updateTransactionsByContract(transaction: TransactionInfo) {
+        if (transaction.blobs) {
+            for (const blob of transaction.blobs) {
+                if (blob.contract_name) {
+                    if (!this.transactionsByContract[blob.contract_name]) {
+                        this.transactionsByContract[blob.contract_name] = [];
+                    }
+                    if (!this.transactionsByContract[blob.contract_name].includes(transaction.tx_hash)) {
+                        this.transactionsByContract[blob.contract_name].push(transaction.tx_hash);
+                    }
+                }
+            }
+        }
+    }
+
     async loadLatest() {
         const response = await fetch(`${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transactions?no_cache=${Date.now()}`);
         let resp = await response.json();
@@ -66,6 +82,8 @@ export class TransactionStore {
         for (let item of resp) {
             this.data[item.tx_hash] = item;
             this.updateTransactionsByBlock(item);
+            await this.loadBlobsAndEvents(item);
+            this.updateTransactionsByContract(item);
         }
     }
 
@@ -112,6 +130,7 @@ export class TransactionStore {
             await this.loadBlobsAndEvents(item);
             // Update the store with the new data
             this.data[item.tx_hash] = { ...item };
+            this.updateTransactionsByContract(item);
         }
     }
 
@@ -119,6 +138,7 @@ export class TransactionStore {
         this.data[tx.tx_hash] = tx;
         this.latest.unshift(tx.tx_hash);
         this.updateTransactionsByBlock(tx);
+        this.updateTransactionsByContract(tx);
     }
 
     async getTransactionsByBlockHeight(height: number): Promise<string[]> {
@@ -133,6 +153,7 @@ export class TransactionStore {
             await this.loadBlobsAndEvents(tx);
             this.data[tx.tx_hash] = tx;
             this.updateTransactionsByBlock(tx);
+            this.updateTransactionsByContract(tx);
         }
 
         return txHashes;
@@ -144,9 +165,23 @@ export class TransactionStore {
         }
 
         const txHashes = await this.getTransactionsByBlockHeight(height);
-        // Note: We don't need to explicitly set transactionsByBlock[blockHash] here
-        // because updateTransactionsByBlock will have already done it when processing
-        // the transactions from getTransactionsByBlockHeight
+        return txHashes;
+    }
+
+    async getTransactionsByContract(contractName: string): Promise<string[]> {
+        // Fetch transactions for this contract from the API
+        const response = await fetch(
+            `${getNetworkIndexerApiUrl(this.network)}/v1/indexer/transactions/contract/${contractName}?no_cache=${Date.now()}`
+        );
+        const transactions = await response.json();
+        const txHashes = transactions.map((tx: TransactionInfo) => tx.tx_hash);
+
+        // Cache the transactions data and update transactionsByContract
+        for (const tx of transactions) {
+            this.data[tx.tx_hash] = tx;
+            this.updateTransactionsByContract(tx);
+        }
+
         return txHashes;
     }
 }

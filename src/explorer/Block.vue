@@ -30,6 +30,10 @@ const tabs = [{ name: "Overview" }, { name: "Raw JSON" }];
 const formatTimestamp = (date: Date) => {
     return `${getTimeAgo(date)} (${date.toLocaleString()})`;
 };
+
+const formatTxTimestamp = (timestamp: number) => {
+    return `${getTimeAgo(timestamp)} (${new Date(timestamp).toLocaleString()})`;
+};
 </script>
 
 <template>
@@ -90,7 +94,15 @@ const formatTimestamp = (date: Date) => {
                             <div class="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center shrink-0">
                                 <span class="text-sm text-secondary">TX</span>
                             </div>
-                            <span class="text-mono truncate">{{ tx_hash }}</span>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-mono truncate">{{ tx_hash }}</span>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <span class="text-neutral">{{ formatTxTimestamp(transactionStore.data[tx_hash].timestamp) }}</span>
+                                    <span class="text-primary px-2 py-0.5 bg-primary/5 rounded-full">
+                                        {{ transactionStore.data[tx_hash].transaction_status }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                         <svg class="w-4 h-4 text-neutral shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
