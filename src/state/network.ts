@@ -49,8 +49,7 @@ export const getNetworkNodeApiUrl = (network: string) => {
 export const getNetworkWebSocketUrl = (network: string) => {
     return {
         localhost: "ws://localhost:8080",
-        devnet: "wss://ws.devnet.hyli.org",
-        testnet: "wss://ws.testnet.hyli.org",
+        devnet: "wss://indexer.devnet.hyli.org",
+        testnet: "wss://indexer.testnet.hyli.org",
     }[network];
 };
-
