@@ -82,8 +82,6 @@ export class TransactionStore {
         for (let item of resp) {
             this.data[item.tx_hash] = item;
             this.updateTransactionsByBlock(item);
-            await this.loadBlobsAndEvents(item);
-            this.updateTransactionsByContract(item);
         }
     }
 
