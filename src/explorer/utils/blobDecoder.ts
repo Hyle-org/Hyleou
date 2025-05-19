@@ -4,6 +4,8 @@ import { deserializeBlackJackAction } from "@/model/blackjack";
 import { deserializeSecp256k1Blob } from "@/model/seckp2256k1";
 import { deserializeWalletAction } from "@/model/wallet";
 import { deserializeHyleAction } from "@/model/hyle";
+import { deserializeSmtTokenAction } from "@/model/smt_token";
+import { deserializeFaucetAction } from "@/model/faucet";
 
 export const parseHexToVec = (hex: string): number[] | null => {
     const tokens = hex.match(/[0-9a-f]{2}/gi);
@@ -75,6 +77,13 @@ export const decodeBlobData = (hex: string, contractName: string): string => {
             case "secp256k1":
                 const secp256k1Blob = deserializeSecp256k1Blob(data);
                 return formatObject(secp256k1Blob);
+            case "smt_token":
+            case "oranj":
+                const smtTokenBlob = deserializeSmtTokenAction(data);
+                return formatObject(smtTokenBlob);
+            case "faucet":
+                const faucetBlob = deserializeFaucetAction(data);
+                return formatObject(faucetBlob);
             case "staking":
                 const stakingAction = hyle.staking.deserializeStakingAction(data);
                 return formatObject(stakingAction);
