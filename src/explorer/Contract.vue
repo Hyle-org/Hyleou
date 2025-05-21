@@ -5,9 +5,21 @@ import { contractStore, transactionStore } from "@/state/data";
 import { computed, watchEffect, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { getTimeAgo } from "@/state/utils";
+import { blockStore } from "@/state/data";
 
 const route = useRoute();
 const contract_name = computed(() => route.params.contract_name as string);
+const blockHash = ref<string | null>(null);
+
+const fetchBlockHash = async (height: number) => {
+    try {
+        const block = await blockStore.value.loadByHeight(height);
+        blockHash.value = block.hash;
+    } catch (error) {
+        console.error('Error fetching block hash:', error);
+        blockHash.value = null;
+    }
+};
 
 watchEffect(() => {
     if (!contractStore.value.data[contract_name.value]) {
@@ -28,6 +40,12 @@ const tabs = [{ name: "Overview" }, { name: "Raw JSON" }];
 const formatTimestamp = (timestamp: number) => {
     return `${getTimeAgo(timestamp)} (${new Date(timestamp).toLocaleString()})`;
 };
+
+watchEffect(() => {
+    if (data.value?.earliest_unsettled) {
+        fetchBlockHash(data.value.earliest_unsettled);
+    }
+});
 </script>
 
 <template>
@@ -82,6 +100,24 @@ const formatTimestamp = (timestamp: number) => {
                     <div class="info-row">
                         <span class="info-label">Total unsettled Transactions:</span>
                         <span class="text-label">{{ data?.unsettled_tx || "0" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Earliest unsettled transaction:</span>
+                        <span class="text-label">
+                            <template v-if="!data || !data.earliest_unsettled">
+                                No unsettled txs
+                            </template>
+                            <template v-else>
+                                <RouterLink 
+                                    v-if="blockHash"
+                                    :to="{ name: 'Block', params: { block_hash: blockHash } }"
+                                    class="text-link"
+                                >
+                                    Block #{{ data.earliest_unsettled }}
+                                </RouterLink>
+                                <span v-else>Block #{{ data.earliest_unsettled }}</span>
+                            </template>
+                        </span>
                     </div>
                 </div>
             </div>

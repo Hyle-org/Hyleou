@@ -58,4 +58,11 @@ export class BlockStore {
         }
         return blocks;
     }
+
+    async loadByHeight(height: number) {
+        const response = await fetch(`${getNetworkIndexerApiUrl(this.network)}/v1/indexer/block/height/${height}?no_cache=${Date.now()}`);
+        const block = await response.json();
+        this.data[block.hash] = block;
+        return block;
+    }
 }

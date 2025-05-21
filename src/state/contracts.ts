@@ -8,6 +8,7 @@ export type ContractInfo = {
     state_commitment: string;
     total_tx: number;
     unsettled_tx: number;
+    earliest_unsettled: number;
 };
 
 export class ContractStore {
