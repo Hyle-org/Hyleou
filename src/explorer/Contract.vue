@@ -125,6 +125,7 @@ watchEffect(() => {
             <!-- Transactions List -->
             <div v-if="activeTab === 'Overview' && transactions.length > 0" class="data-card">
                 <h3 class="card-header">Transactions</h3>
+                {{ data.total_tx > 100 ? '(Latest 100)' : `` }}
                 <div>
                     <RouterLink
                         v-for="tx_hash in transactions"
